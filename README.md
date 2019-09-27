@@ -11,4 +11,4 @@ Standard OpenPose flags can be used as well. For example, to disable multi threa
 rosrun ros_openpose rosOpenpose --disable_multi_thread
 ```
 
-*Please note that this is the beta version. At present, it is tested only with realsense camera,. However, I am going to make it generic very soon.*
+*Please note that this is the beta version. At present, it is tested only with realsense camera. However, I am going to make it generic very soon.*
