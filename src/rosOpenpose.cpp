@@ -2,6 +2,7 @@
 * rosOpenpose.cpp: the main file
 * Author: Ravi Joshi
 * Date: 2019/09/27
+* src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/master/examples/tutorial_api_cpp
 */
 
 // Command-line user intraface
@@ -38,6 +39,7 @@ public:
   {
     try
     {
+      // get the latest color image from the camera
       auto image = mSPtrCameraReader->getFrame();
 
       if (!image.empty())
@@ -62,7 +64,7 @@ public:
     catch (const std::exception& e)
     {
       this->stop();
-      ROS_ERROR("%s %d %s %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+      ROS_ERROR("Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
       return nullptr;
     }
   }
@@ -93,9 +95,13 @@ public:
         // Accesing each element of the keypoints
         const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
 
+        // update timestamp
         mFrame.header.stamp = ros::Time::now();
+
+        // make sure to clear previous data
         mFrame.persons.clear();
 
+        // update with the new data
         int personCount = poseKeypoints.getSize(0);
         mFrame.persons.resize(personCount);
 
@@ -113,20 +119,12 @@ public:
         }
 
         mFramePublisher.publish(mFrame);
-
-        // Display rendered output image
-        cv::imshow("ros_openpose | " + OPEN_POSE_NAME_AND_VERSION, datumsPtr->at(0)->cvOutputData);
-
-        // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-        const char key = (char)cv::waitKey(1);
-        if (key == 27)
-          this->stop();
       }
     }
     catch (const std::exception& e)
     {
       this->stop();
-      ROS_ERROR("%s %d %s %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+      ROS_ERROR("Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
     }
   }
 
@@ -142,9 +140,14 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
   {
     // Configuring OpenPose
 
+    // clang-format off
     // logging_level
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__,
-              __FUNCTION__, __FILE__);
+    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255,
+              "Wrong logging_level value.",
+              __LINE__,
+              __FUNCTION__,
+              __FILE__);
+
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     op::Profiler::setDefaultX(FLAGS_profile_speed);
 
@@ -175,8 +178,10 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
     const auto keypointScaleMode = op::flagsToScaleMode(FLAGS_keypoint_scale);
 
     // heatmaps to add
-    const auto heatMapTypes =
-        op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
+    const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts,
+                                                  FLAGS_heatmaps_add_bkg,
+                                                  FLAGS_heatmaps_add_PAFs);
+
     const auto heatMapScaleMode = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
 
     // >1 camera view?
@@ -210,7 +215,8 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
                                                   FLAGS_num_gpu_start,
                                                   FLAGS_scale_number,
                                                   (float)FLAGS_scale_gap,
-                                                  op::flagsToRenderMode(FLAGS_render_pose, multipleView),
+                                                  op::flagsToRenderMode(FLAGS_render_pose,
+                                                                        multipleView),
                                                   poseModel,
                                                   !FLAGS_disable_blending,
                                                   (float)FLAGS_alpha_pose,
@@ -231,31 +237,36 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
     opWrapper.configure(wrapperStructPose);
 
     // Face configuration (use op::WrapperStructFace{} to disable it)
-    const op::WrapperStructFace wrapperStructFace{
-        FLAGS_face,
-        faceDetector,
-        faceNetInputSize,
-        op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
-        (float)FLAGS_face_alpha_pose,
-        (float)FLAGS_face_alpha_heatmap,
-        (float)FLAGS_face_render_threshold};
+    const op::WrapperStructFace wrapperStructFace{FLAGS_face,
+                                                  faceDetector,
+                                                  faceNetInputSize,
+                                                  op::flagsToRenderMode(FLAGS_face_render,
+                                                                        multipleView,
+                                                                        FLAGS_render_pose),
+                                                  (float)FLAGS_face_alpha_pose,
+                                                  (float)FLAGS_face_alpha_heatmap,
+                                                  (float)FLAGS_face_render_threshold};
     opWrapper.configure(wrapperStructFace);
 
     // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::WrapperStructHand wrapperStructHand{
-        FLAGS_hand,
-        handDetector,
-        handNetInputSize,
-        FLAGS_hand_scale_number,
-        (float)FLAGS_hand_scale_range,
-        op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
-        (float)FLAGS_hand_alpha_pose,
-        (float)FLAGS_hand_alpha_heatmap,
-        (float)FLAGS_hand_render_threshold};
+    const op::WrapperStructHand wrapperStructHand{FLAGS_hand,
+                                                  handDetector,
+                                                  handNetInputSize,
+                                                  FLAGS_hand_scale_number,
+                                                  (float)FLAGS_hand_scale_range,
+                                                  op::flagsToRenderMode(FLAGS_hand_render,
+                                                                        multipleView,
+                                                                        FLAGS_render_pose),
+                                                  (float)FLAGS_hand_alpha_pose,
+                                                  (float)FLAGS_hand_alpha_heatmap,
+                                                  (float)FLAGS_hand_render_threshold};
     opWrapper.configure(wrapperStructHand);
 
     // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
-    const op::WrapperStructExtra wrapperStructExtra{FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking,
+    const op::WrapperStructExtra wrapperStructExtra{FLAGS_3d,
+                                                    FLAGS_3d_min_views,
+                                                    FLAGS_identification,
+                                                    FLAGS_tracking,
                                                     FLAGS_ik_threads};
     opWrapper.configure(wrapperStructExtra);
 
@@ -281,8 +292,13 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
                                                       FLAGS_udp_port};
     opWrapper.configure(wrapperStructOutput);
 
-    // No default GUI because we have added GUI on custom outout
-    opWrapper.configure(op::WrapperStructGui{});
+    // GUI (comment or use default argument to disable any visual output)
+    const op::WrapperStructGui wrapperStructGui{op::flagsToDisplayMode(FLAGS_display,
+                                                                       FLAGS_3d),
+                                                !FLAGS_no_gui_verbose,
+                                                FLAGS_fullscreen};
+    opWrapper.configure(wrapperStructGui);
+    // clang-format on
 
     // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
     if (FLAGS_disable_multi_thread)
@@ -290,7 +306,7 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
   }
   catch (const std::exception& e)
   {
-    ROS_ERROR("%s %d %s %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+    ROS_ERROR("Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
   }
 }
 
@@ -312,28 +328,28 @@ int main(int argc, char* argv[])
   // the frame consists of the location of detected body parts of each person
   const ros::Publisher framePublisher = nh.advertise<ros_openpose::Frame>("frame", 1);
 
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
-
   try
   {
     ROS_INFO("Starting ros_openpose...");
     op::Wrapper opWrapper;
     configureOpenPose(opWrapper, cameraReader, framePublisher);
 
-    // start, run, and stop processing
-    // exec() blocks this thread until OpenPose wrapper has finished
-    opWrapper.exec();
+    // start and run
+    opWrapper.start();
+
+    // exit when Ctrl-C is pressed, or the node is shutdown by the master
+    ros::spin();
 
     // return successful message
     ROS_INFO("Exiting ros_openpose...");
-    spinner.stop();
+
+    // stop processing
+    opWrapper.stop();
     return 0;
   }
   catch (const std::exception& e)
   {
-    ROS_ERROR("%s %d %s %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
-    spinner.stop();
+    ROS_ERROR("Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
     return -1;
   }
 }
