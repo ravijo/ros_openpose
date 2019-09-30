@@ -40,7 +40,7 @@ public:
     try
     {
       // get the latest color image from the camera
-      auto image = mSPtrCameraReader->getFrame();
+      auto image = mSPtrCameraReader->getColorFrame();
 
       if (!image.empty())
       {
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
 {
   ros::init(argc, argv, "ros_openpose");
   ros::NodeHandle nh;
-  image_transport::ImageTransport it(nh);
+  // image_transport::ImageTransport it(nh);
 
   // path of the dir where openpose models are located
   FLAGS_model_folder = "/home/ravi/tools/openpose/models/";
@@ -322,8 +322,9 @@ int main(int argc, char* argv[])
   // parsing command line flags
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  const std::string rosTopic = "/camera/color/image_raw";
-  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(it, rosTopic);
+  const std::string colorTopic = "/camera/color/image_raw";
+  const std::string depthTopic = "/camera/aligned_depth_to_color/image_raw";
+  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic);
 
   // the frame consists of the location of detected body parts of each person
   const ros::Publisher framePublisher = nh.advertise<ros_openpose::Frame>("frame", 1);

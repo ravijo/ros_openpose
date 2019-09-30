@@ -12,24 +12,32 @@
 
 typedef std::shared_ptr<ros_openpose::CameraReader> sPtrCameraReader;
 
-void show(std::vector<sPtrCameraReader>& readers)
+void show(sPtrCameraReader readers)
 {
   ros::Rate loopRate(10);
   while (ros::ok())
   {
-    for (int i = 0; i < readers.size(); i++)
+    auto colorImage = readers->getColorFrame();
+    auto depthImage = readers->getDepthFrame();
+
+    if (!colorImage.empty())
     {
-      auto image = readers[i]->getFrame();
-      if (!image.empty())
-      {
-        auto windowName = std::to_string(i + 1);
-        cv::imshow(windowName, image);
-      }
-      else
-      {
-        // display the error at most once per 10 seconds
-        ROS_WARN_THROTTLE(10, "Empty image frame detected. Ignoring...");
-      }
+      cv::imshow("color image", colorImage);
+    }
+    else
+    {
+      // display the error at most once per 10 seconds
+      ROS_WARN_THROTTLE(10, "Empty color image frame detected. Ignoring...");
+    }
+
+    if (!depthImage.empty())
+    {
+      cv::imshow("depth image", depthImage);
+    }
+    else
+    {
+      // display the error at most once per 10 seconds
+      ROS_WARN_THROTTLE(10, "Empty depth image frame detected. Ignoring...");
     }
 
     int key = cv::waitKey(1) & 255;
@@ -45,22 +53,12 @@ int main(int argc, char* argv[])
 {
   ros::init(argc, argv, "test_camera_reader");
   ros::NodeHandle nh;
-  image_transport::ImageTransport it(nh);
 
-  std::vector<sPtrCameraReader> readers;
+  const std::string colorTopic = "/camera/color/image_raw";
+  const std::string depthTopic = "/camera/aligned_depth_to_color/image_raw";
+  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic);
 
-  const int cameras = 1;
-  for (size_t i = 0; i < cameras; i++)
-  {
-    // topicName is following the convention mentioned below:
-    // /camera1/color/image_raw
-    // /camera2/color/image_raw
-    // /camera3/color/image_raw
-    auto topicName = std::string("/camera") + std::to_string(i + 1) + std::string("/color/image_raw");
-    auto reader = std::make_shared<ros_openpose::CameraReader>(it, topicName);
-    readers.emplace_back(reader);
-  }
+  show(cameraReader);
 
-  show(readers);
   return 0;
 }

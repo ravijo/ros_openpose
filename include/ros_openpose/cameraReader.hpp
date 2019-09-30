@@ -9,7 +9,8 @@
 // ROS headers
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
-#include <image_transport/image_transport.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 
 // CV brigge header
 #include <cv_bridge/cv_bridge.h>
@@ -17,21 +18,28 @@
 // OpenCV header
 #include <opencv2/core/core.hpp>
 
-// std::vector header
+// c++ headers
 #include <vector>
+#include <mutex>
 
 namespace ros_openpose
 {
   class CameraReader
   {
   private:
-    cv::Mat mImage;
-    std::string mTopicName;
-    image_transport::ImageTransport mIt;
-    image_transport::Subscriber mSubscriber;
+    cv::Mat mColorImage;
+    cv::Mat mDepthImage;
+    std::string mColorTopic;
+    std::string mDepthTopic;
+    ros::NodeHandle mNh;
+    std::mutex mImageMutex;
+
+    std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrColorImageSub;
+    std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrDepthImageSub;
+    std::shared_ptr<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image>> mSPtrSyncSubscriber;
 
     inline void subscribe();
-    void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+    void callback(const sensor_msgs::ImageConstPtr& colorMsg, const sensor_msgs::ImageConstPtr& depthMsg);
 
   public:
     // camera calibration parameters
@@ -48,15 +56,21 @@ namespace ros_openpose
     CameraReader& operator=(const CameraReader& other);
 
     // main constructor
-    CameraReader(image_transport::ImageTransport& it, const std::string& topicName);
+    CameraReader(ros::NodeHandle& nh, const std::string& colorTopic, const std::string& depthTopic);
 
     // destructor
     ~CameraReader();
 
-    // get the image from camera
-    const cv::Mat getFrame()
+    // get the color image from camera
+    const cv::Mat getColorFrame()
     {
-      return mImage;
+      return mColorImage;
+    }
+
+    // get the depth image from camera
+    const cv::Mat getDepthFrame()
+    {
+      return mDepthImage;
     }
 
     // get the camera extrinsic parameter

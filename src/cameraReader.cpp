@@ -8,14 +8,15 @@
 
 namespace ros_openpose
 {
-  CameraReader::CameraReader(image_transport::ImageTransport& it, const std::string& topicName)
-    : mIt(it), mTopicName(topicName)
+  CameraReader::CameraReader(ros::NodeHandle& nh, const std::string& colorTopic, const std::string& depthTopic)
+    : mNh(nh), mColorTopic(colorTopic), mDepthTopic(depthTopic)
   {
     // std::cout << "[" << this << "] constructor called" << std::endl;
     subscribe();
   }
 
-  CameraReader::CameraReader(const CameraReader& other) : mIt(other.mIt), mTopicName(other.mTopicName)
+  CameraReader::CameraReader(const CameraReader& other)
+    : mNh(other.mNh), mColorTopic(other.mColorTopic), mDepthTopic(other.mDepthTopic)
   {
     // std::cout << "[" << this << "] copy constructor called" << std::endl;
     subscribe();
@@ -24,8 +25,10 @@ namespace ros_openpose
   CameraReader& CameraReader::operator=(const CameraReader& other)
   {
     // std::cout << "[" << this << "] copy assignment called" << std::endl;
-    mIt = other.mIt;
-    mTopicName = other.mTopicName;
+    mNh = other.mNh;
+    mColorTopic = other.mColorTopic;
+    mDepthTopic = other.mDepthTopic;
+
     subscribe();
     return *this;
   }
@@ -37,17 +40,35 @@ namespace ros_openpose
 
   inline void CameraReader::subscribe()
   {
-    mSubscriber = mIt.subscribe(mTopicName, 1, &CameraReader::imageCallback, this);
+    mSPtrColorImageSub = std::make_shared<message_filters::Subscriber<sensor_msgs::Image>>(mNh, mColorTopic, 1);
+    mSPtrDepthImageSub = std::make_shared<message_filters::Subscriber<sensor_msgs::Image>>(mNh, mDepthTopic, 1);
+
+    int queueSize = 4;
+
+    // clang-format off
+    mSPtrSyncSubscriber = std::make_shared<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image>>(
+        *mSPtrColorImageSub,
+        *mSPtrDepthImageSub,
+        queueSize);
+    // clang-format on
+
+    mSPtrSyncSubscriber->registerCallback(&CameraReader::callback, this);
   }
 
-  void CameraReader::imageCallback(const sensor_msgs::ImageConstPtr& msg)
+  void CameraReader::callback(const sensor_msgs::ImageConstPtr& colorMsg, const sensor_msgs::ImageConstPtr& depthMsg)
   {
     try
     {
-      // since we donot want to change the data, therefore we need not copy it, we can just share it.
+      // since we donot want to change the data, therefore we need not copy nh, we can just share nh.
       // auto cvPtr = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::BGR8);
-      auto cvPtr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-      mImage = cvPtr->image;
+      auto colorPtr = cv_bridge::toCvCopy(colorMsg, sensor_msgs::image_encodings::BGR8);
+      auto depthPtr = cv_bridge::toCvCopy(depthMsg, sensor_msgs::image_encodings::TYPE_16UC1);
+
+      {
+        std::lock_guard<std::mutex> lock(mImageMutex);
+        mColorImage = colorPtr->image;
+        mDepthImage = depthPtr->image;
+      }
     }
     catch (cv_bridge::Exception& e)
     {
