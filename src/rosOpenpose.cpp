@@ -40,9 +40,9 @@ public:
     try
     {
       // get the latest color image from the camera
-      auto image = mSPtrCameraReader->getColorFrame();
+      auto colorImage = mSPtrCameraReader->getColorFrame();
 
-      if (!image.empty())
+      if (!colorImage.empty())
       {
         // Create new datum
         auto datumsPtr = std::make_shared<std::vector<sPtrDatum>>();
@@ -51,13 +51,13 @@ public:
         datumPtr = std::make_shared<op::Datum>();
 
         // Fill datum
-        datumPtr->cvInputData = image;
+        datumPtr->cvInputData = colorImage;
         return datumsPtr;
       }
       else
       {
         // display the error at most once per 10 seconds
-        ROS_WARN_THROTTLE(10, "Empty image frame detected. Ignoring...");
+        ROS_WARN_THROTTLE(10, "Empty color image frame detected. Ignoring...");
         return nullptr;
       }
     }
@@ -77,9 +77,10 @@ private:
 class WUserOutput : public op::WorkerConsumer<sPtrVecSPtrDatum>
 {
 public:
-  WUserOutput(const ros::Publisher& framePublisher) : mFramePublisher{framePublisher}
+  WUserOutput(const ros::Publisher& framePublisher, const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader)
+    : mFramePublisher{framePublisher}, mSPtrCameraReader{sPtrCameraReader}
   {
-    mFrame.header.frame_id = "realsense";
+    mFrame.header.frame_id = "camera_depth_optical_frame";
   }
 
   void initializationOnThread()
@@ -102,19 +103,45 @@ public:
         mFrame.persons.clear();
 
         // update with the new data
-        int personCount = poseKeypoints.getSize(0);
+        const int personCount = poseKeypoints.getSize(0);
+        const int bodyPartCount = poseKeypoints.getSize(1);
+
         mFrame.persons.resize(personCount);
+
+        const auto depthImage = mSPtrCameraReader->getDepthFrame();
 
         for (auto person = 0; person < personCount; person++)
         {
-          int bodyPartCount = poseKeypoints.getSize(1);
           mFrame.persons[person].bodyParts.resize(bodyPartCount);
 
           for (auto bodyPart = 0; bodyPart < bodyPartCount; bodyPart++)
           {
-            mFrame.persons[person].bodyParts[bodyPart].pixel.x = poseKeypoints[{person, bodyPart, 0}];
-            mFrame.persons[person].bodyParts[bodyPart].pixel.y = poseKeypoints[{person, bodyPart, 1}];
-            mFrame.persons[person].bodyParts[bodyPart].score = poseKeypoints[{person, bodyPart, 2}];
+            // src:
+            // https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/output.md#keypoint-format-in-the-c-api
+
+            // easy version
+            // auto x = poseKeypoints[{person, bodyPart, 0}];
+            // auto y = poseKeypoints[{person, bodyPart, 1}];
+
+            // slightly more efficient version
+            const auto baseIndex = poseKeypoints.getSize(2) * (person * bodyPartCount + bodyPart);
+            const auto x = poseKeypoints[baseIndex];
+            const auto y = poseKeypoints[baseIndex + 1];
+            const auto score = poseKeypoints[baseIndex + 2];
+
+            mFrame.persons[person].bodyParts[bodyPart].pixel.x = x;
+            mFrame.persons[person].bodyParts[bodyPart].pixel.y = y;
+            mFrame.persons[person].bodyParts[bodyPart].score = score;
+
+            // our depth image type is 16UC1 which has unsigned short as an underlying type
+            auto depth = depthImage.at<unsigned short>(static_cast<int>(y), static_cast<int>(x));
+
+            float point3D[3];
+            mSPtrCameraReader->compute3DPoint(x, y, depth * 0.001f, point3D);
+
+            mFrame.persons[person].bodyParts[bodyPart].point.x = point3D[0];
+            mFrame.persons[person].bodyParts[bodyPart].point.y = point3D[1];
+            mFrame.persons[person].bodyParts[bodyPart].point.z = point3D[2];
           }
         }
 
@@ -129,11 +156,12 @@ public:
   }
 
 private:
-  const ros::Publisher mFramePublisher;
   ros_openpose::Frame mFrame;
+  const ros::Publisher mFramePublisher;
+  const std::shared_ptr<ros_openpose::CameraReader>& mSPtrCameraReader;
 };
 
-void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader,
+void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpose::CameraReader>& cameraReader,
                        const ros::Publisher& framePublisher)
 {
   try
@@ -196,8 +224,8 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
     const bool enableGoogleLogging = true;
 
     // Initializing the user custom classes
-    auto wUserInput = std::make_shared<WUserInput>(sPtrCameraReader);
-    auto wUserOutput = std::make_shared<WUserOutput>(framePublisher);
+    auto wUserInput = std::make_shared<WUserInput>(cameraReader);
+    auto wUserOutput = std::make_shared<WUserOutput>(framePublisher, cameraReader);
 
     // Add custom processing
     const auto workerInputOnNewThread = true;
@@ -324,7 +352,8 @@ int main(int argc, char* argv[])
 
   const std::string colorTopic = "/camera/color/image_raw";
   const std::string depthTopic = "/camera/aligned_depth_to_color/image_raw";
-  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic);
+  const std::string camInfoTopic = "/camera/color/camera_info";
+  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic, camInfoTopic);
 
   // the frame consists of the location of detected body parts of each person
   const ros::Publisher framePublisher = nh.advertise<ros_openpose::Frame>("frame", 1);

@@ -8,15 +8,16 @@
 
 namespace ros_openpose
 {
-  CameraReader::CameraReader(ros::NodeHandle& nh, const std::string& colorTopic, const std::string& depthTopic)
-    : mNh(nh), mColorTopic(colorTopic), mDepthTopic(depthTopic)
+  CameraReader::CameraReader(ros::NodeHandle& nh, const std::string& colorTopic, const std::string& depthTopic,
+                             const std::string& camInfoTopic)
+    : mNh(nh), mColorTopic(colorTopic), mDepthTopic(depthTopic), mCamInfoTopic(camInfoTopic)
   {
     // std::cout << "[" << this << "] constructor called" << std::endl;
     subscribe();
   }
 
   CameraReader::CameraReader(const CameraReader& other)
-    : mNh(other.mNh), mColorTopic(other.mColorTopic), mDepthTopic(other.mDepthTopic)
+    : mNh(other.mNh), mColorTopic(other.mColorTopic), mDepthTopic(other.mDepthTopic), mCamInfoTopic(other.mCamInfoTopic)
   {
     // std::cout << "[" << this << "] copy constructor called" << std::endl;
     subscribe();
@@ -28,6 +29,7 @@ namespace ros_openpose
     mNh = other.mNh;
     mColorTopic = other.mColorTopic;
     mDepthTopic = other.mDepthTopic;
+    mCamInfoTopic = other.mCamInfoTopic;
 
     subscribe();
     return *this;
@@ -52,10 +54,22 @@ namespace ros_openpose
         queueSize);
     // clang-format on
 
-    mSPtrSyncSubscriber->registerCallback(&CameraReader::callback, this);
+    mSPtrSyncSubscriber->registerCallback(&CameraReader::imageCallback, this);
+
+    mCamInfoSubscriber = mNh.subscribe(mCamInfoTopic, 1, &CameraReader::camInfoCallback, this);
   }
 
-  void CameraReader::callback(const sensor_msgs::ImageConstPtr& colorMsg, const sensor_msgs::ImageConstPtr& depthMsg)
+  void CameraReader::camInfoCallback(const sensor_msgs::CameraInfoConstPtr& camMsg)
+  {
+    mSPtrCameraInfo = std::make_shared<sensor_msgs::CameraInfo>(*camMsg);
+    if (mSPtrCameraInfo != nullptr)
+    {
+      mCamInfoSubscriber.shutdown();
+    }
+  }
+
+  void CameraReader::imageCallback(const sensor_msgs::ImageConstPtr& colorMsg,
+                                   const sensor_msgs::ImageConstPtr& depthMsg)
   {
     try
     {

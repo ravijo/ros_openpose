@@ -56,7 +56,8 @@ int main(int argc, char* argv[])
 
   const std::string colorTopic = "/camera/color/image_raw";
   const std::string depthTopic = "/camera/aligned_depth_to_color/image_raw";
-  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic);
+  const std::string camInfoTopic = "/camera/color/camera_info";
+  const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic, camInfoTopic);
 
   show(cameraReader);
 
