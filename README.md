@@ -4,10 +4,11 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 :heavy_check_mark: Intel Realsense Camera
 
+</br>
 
 <p align="center">
     <img src="files/ros_openpose.gif", width="800">
-    <br>
+    </br>
     <sup>Sample video showing visualization on RViz</sup>
 </p>
 
