@@ -1,6 +1,11 @@
 # ros_openpose
 ROS wrapper for OpenPose
 
+It supports *(currently but others are planned)*-
+
+:heavy_check_mark: Intel Realsense Camera
+
+
 <p align="center">
     <img src="files/ros_openpose.gif", width="800">
     <br>
@@ -18,4 +23,3 @@ Standard OpenPose flags can be used as well. For example, to disable multi threa
 rosrun ros_openpose rosOpenpose --disable_multi_thread
 ```
 
-*Please note that this is a beta version. At present, it is tested only with realsense camera. However, I am going to make it generic very soon.*
