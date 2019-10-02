@@ -141,7 +141,7 @@ if __name__ == '__main__':
     body_topic = '/frame'
     skeleton_frame = 'camera_depth_optical_frame'
     id_text_size = 0.1
-    skeleton_line_width = 0.005
+    skeleton_line_width = 0.01
     min_score = 0.1
 
 

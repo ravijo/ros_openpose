@@ -73,16 +73,12 @@ namespace ros_openpose
   {
     try
     {
-      // since we donot want to change the data, therefore we need not copy nh, we can just share nh.
-      // auto cvPtr = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::BGR8);
-      auto colorPtr = cv_bridge::toCvCopy(colorMsg, sensor_msgs::image_encodings::BGR8);
-      auto depthPtr = cv_bridge::toCvCopy(depthMsg, sensor_msgs::image_encodings::TYPE_16UC1);
+      // since we don't want to change the data, therefore we need not copy the image, we can just share it.
+      auto colorPtr = cv_bridge::toCvShare(colorMsg, sensor_msgs::image_encodings::BGR8);
+      auto depthPtr = cv_bridge::toCvShare(depthMsg, sensor_msgs::image_encodings::TYPE_16UC1);
 
-      {
-        std::lock_guard<std::mutex> lock(mImageMutex);
-        mColorImage = colorPtr->image;
-        mDepthImage = depthPtr->image;
-      }
+      mColorImage = colorPtr->image;
+      mDepthImage = depthPtr->image;
     }
     catch (cv_bridge::Exception& e)
     {

@@ -5,9 +5,6 @@
 * src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/master/examples/tutorial_api_cpp
 */
 
-// Command-line user intraface
-#define OPENPOSE_FLAGS_DISABLE_PRODUCER
-
 // ROS headers
 #include <ros/ros.h>
 
@@ -27,7 +24,7 @@ typedef std::shared_ptr<std::vector<sPtrDatum>> sPtrVecSPtrDatum;
 class WUserInput : public op::WorkerProducer<sPtrVecSPtrDatum>
 {
 public:
-  WUserInput(const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader) : mSPtrCameraReader{sPtrCameraReader}
+  WUserInput(const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader) : mSPtrCameraReader(sPtrCameraReader)
   {
   }
 
@@ -40,7 +37,7 @@ public:
     try
     {
       // get the latest color image from the camera
-      auto colorImage = mSPtrCameraReader->getColorFrame();
+      auto& colorImage = mSPtrCameraReader->getColorFrame();
 
       if (!colorImage.empty())
       {
@@ -70,7 +67,7 @@ public:
   }
 
 private:
-  const std::shared_ptr<ros_openpose::CameraReader>& mSPtrCameraReader;
+  const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
 };
 
 // The outpout worker
@@ -78,7 +75,7 @@ class WUserOutput : public op::WorkerConsumer<sPtrVecSPtrDatum>
 {
 public:
   WUserOutput(const ros::Publisher& framePublisher, const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader)
-    : mFramePublisher{framePublisher}, mSPtrCameraReader{sPtrCameraReader}
+    : mFramePublisher(framePublisher), mSPtrCameraReader(sPtrCameraReader)
   {
     mFrame.header.frame_id = "camera_depth_optical_frame";
   }
@@ -102,14 +99,13 @@ public:
         // make sure to clear previous data
         mFrame.persons.clear();
 
-        // update with the new data
+        // get the size
         const int personCount = poseKeypoints.getSize(0);
         const int bodyPartCount = poseKeypoints.getSize(1);
 
         mFrame.persons.resize(personCount);
 
-        const auto depthImage = mSPtrCameraReader->getDepthFrame();
-
+        // update with the new data
         for (auto person = 0; person < personCount; person++)
         {
           mFrame.persons[person].bodyParts.resize(bodyPartCount);
@@ -129,16 +125,12 @@ public:
             const auto y = poseKeypoints[baseIndex + 1];
             const auto score = poseKeypoints[baseIndex + 2];
 
+            float point3D[3];
+            mSPtrCameraReader->compute3DPoint(x, y, point3D);
+
             mFrame.persons[person].bodyParts[bodyPart].pixel.x = x;
             mFrame.persons[person].bodyParts[bodyPart].pixel.y = y;
             mFrame.persons[person].bodyParts[bodyPart].score = score;
-
-            // our depth image type is 16UC1 which has unsigned short as an underlying type
-            auto depth = depthImage.at<unsigned short>(static_cast<int>(y), static_cast<int>(x));
-
-            float point3D[3];
-            mSPtrCameraReader->compute3DPoint(x, y, depth * 0.001f, point3D);
-
             mFrame.persons[person].bodyParts[bodyPart].point.x = point3D[0];
             mFrame.persons[person].bodyParts[bodyPart].point.y = point3D[1];
             mFrame.persons[person].bodyParts[bodyPart].point.z = point3D[2];
@@ -158,7 +150,7 @@ public:
 private:
   ros_openpose::Frame mFrame;
   const ros::Publisher mFramePublisher;
-  const std::shared_ptr<ros_openpose::CameraReader>& mSPtrCameraReader;
+  const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
 };
 
 void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpose::CameraReader>& cameraReader,

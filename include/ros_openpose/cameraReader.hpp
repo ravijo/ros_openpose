@@ -19,9 +19,8 @@
 // OpenCV header
 #include <opencv2/core/core.hpp>
 
-// c++ headers
+// c++ header
 #include <vector>
-#include <mutex>
 
 namespace ros_openpose
 {
@@ -34,9 +33,9 @@ namespace ros_openpose
     std::string mDepthTopic;
     std::string mCamInfoTopic;
     ros::NodeHandle mNh;
-    std::mutex mImageMutex;
     ros::Subscriber mCamInfoSubscriber;
 
+    // camera calibration parameters
     std::shared_ptr<sensor_msgs::CameraInfo> mSPtrCameraInfo;
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrColorImageSub;
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrDepthImageSub;
@@ -47,10 +46,6 @@ namespace ros_openpose
     void camInfoCallback(const sensor_msgs::CameraInfoConstPtr& camMsg);
 
   public:
-    // camera calibration parameters
-    cv::Mat mCameraExtrinsics;
-    cv::Mat mCameraIntrinsics;
-
     // we don't want to instantiate using deafult constructor
     CameraReader() = delete;
 
@@ -68,19 +63,19 @@ namespace ros_openpose
     ~CameraReader();
 
     // get the color image from camera
-    const cv::Mat getColorFrame()
+    const cv::Mat& getColorFrame()
     {
       return mColorImage;
     }
 
     // get the depth image from camera
-    const cv::Mat getDepthFrame()
+    const cv::Mat& getDepthFrame()
     {
       return mDepthImage;
     }
 
     // compute pixel to 3D without considering distortion
-    void compute3DPoint(const float pixel_x, const float pixel_y, const float depth, float (&point)[3])
+    void compute3DPoint(const float pixel_x, const float pixel_y, float (&point)[3])
     {
       /*
       * K.at(0) = intrinsic.fx
@@ -89,24 +84,18 @@ namespace ros_openpose
       * K.at(5) = intrinsic.ppy
       */
 
-      float x = (pixel_x - mSPtrCameraInfo->K.at(2)) / mSPtrCameraInfo->K.at(0);
-      float y = (pixel_y - mSPtrCameraInfo->K.at(5)) / mSPtrCameraInfo->K.at(4);
+      // our depth image type is 16UC1 which has unsigned short as an underlying type
+      auto depth = mDepthImage.at<unsigned short>(static_cast<int>(pixel_y), static_cast<int>(pixel_x));
 
-      point[0] = depth * x;
-      point[1] = depth * y;
-      point[2] = depth;
-    }
+      // convert to meter (SI units)
+      auto depthSI = depth * 0.001f;
 
-    // get the camera extrinsic parameter
-    const cv::Mat getCameraExtrinsics()
-    {
-      return mCameraExtrinsics;
-    }
+      auto x = (pixel_x - mSPtrCameraInfo->K.at(2)) / mSPtrCameraInfo->K.at(0);
+      auto y = (pixel_y - mSPtrCameraInfo->K.at(5)) / mSPtrCameraInfo->K.at(4);
 
-    // get the camera intrinsic parameter
-    const cv::Mat getCameraIntrinsics()
-    {
-      return mCameraIntrinsics;
+      point[0] = depthSI * x;
+      point[1] = depthSI * y;
+      point[2] = depthSI;
     }
   };
 }
