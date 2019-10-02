@@ -1,7 +1,6 @@
 # ros_openpose
-ROS wrapper for OpenPose
 
-It supports *(currently but others are planned)*-
+ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 :heavy_check_mark: Intel Realsense Camera
 
