@@ -20,7 +20,8 @@
 typedef std::shared_ptr<op::Datum> sPtrDatum;
 typedef std::shared_ptr<std::vector<sPtrDatum>> sPtrVecSPtrDatum;
 
-// The input worker
+// the input worker. the job of this worker is to provide color data to
+// openpose wrapper
 class WUserInput : public op::WorkerProducer<sPtrVecSPtrDatum>
 {
 public:
@@ -36,6 +37,8 @@ public:
   {
     try
     {
+      // just to make the CPU usage low
+      // need to think of a better way instead.
       std::this_thread::sleep_for(std::chrono::microseconds{100});
 
       // get the latest color image from the camera
@@ -43,13 +46,13 @@ public:
 
       if (!colorImage.empty())
       {
-        // Create new datum
+        // create new datum
         auto datumsPtr = std::make_shared<std::vector<sPtrDatum>>();
         datumsPtr->emplace_back();
         auto& datumPtr = datumsPtr->at(0);
         datumPtr = std::make_shared<op::Datum>();
 
-        // Fill datum
+        // fill the datum
         datumPtr->cvInputData = colorImage;
         return datumsPtr;
       }
@@ -72,7 +75,8 @@ private:
   const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
 };
 
-// The outpout worker
+// the outpout worker. the job of this worker is to receive the keypoints detected in 2D
+// space. it then convert 2D pixels to 3D coordinates (wrt camera coordinate system)
 class WUserOutput : public op::WorkerConsumer<sPtrVecSPtrDatum>
 {
 public:
@@ -92,7 +96,7 @@ public:
     {
       if (datumsPtr != nullptr && !datumsPtr->empty())
       {
-        // Accesing each element of the keypoints
+        // accesing each element of the keypoints
         const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
 
         // update timestamp

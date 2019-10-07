@@ -59,12 +59,12 @@ namespace ros_openpose
     CameraReader(ros::NodeHandle& nh, const std::string& colorTopic, const std::string& depthTopic,
                  const std::string& camInfoTopic);
 
-    // destructor
+    // we are okay with default destructor
     ~CameraReader() = default;
 
-    // lock color frame. remember that we
+    // returns the latest color image from camera
+    // it locks the color frame. remember that we
     // are just passing the pointer instead of copying whole data
-    // the function returns a color image from camera
     const cv::Mat& getColorFrame()
     {
       mMutex.lock();
@@ -74,6 +74,8 @@ namespace ros_openpose
     }
 
     // get the depth image from camera
+    // unsafe to call this function
+    // todo: remove this function
     const cv::Mat& getDepthFrame()
     {
       return mDepthImage;
@@ -100,6 +102,10 @@ namespace ros_openpose
 
       // our depth image type is 16UC1 which has unsigned short as an underlying type
       auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixel_y), static_cast<int>(pixel_x));
+
+      // no need to proceed further if the depth is zero
+      // the depth represents the distance of an object placed infront of the camera
+      // therefore depth must be always a positive number
       if (depth <= 0)
         return;
 

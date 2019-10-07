@@ -14,7 +14,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 
 class RealtimeVisualization():
-    def __init__(self, ns, body_topic, skeleton_frame, id_text_size, skeleton_line_width):
+    def __init__(self, ns, frame_topic, skeleton_frame, id_text_size, skeleton_line_width):
         self.ns = ns
         self.skeleton_frame = skeleton_frame
         self.id_text_size = id_text_size
@@ -63,14 +63,24 @@ class RealtimeVisualization():
         # write person id on the top of his head
         self.nose_id = 0
 
-        self.skeleton_pub = rospy.Publisher(self.ns, MarkerArray, queue_size=2)
+        # define a publisher to publish the 3D skeleton of multiple people
+        self.skeleton_pub = rospy.Publisher(self.ns, MarkerArray, queue_size=1)
 
         # define a subscriber to retrive tracked bodies
-        rospy.Subscriber(body_topic, Frame, self.receive_skeleton_callback)
+        rospy.Subscriber(frame_topic, Frame, self.frame_callback)
+
+
+    def spin(self):
+        '''
+        We enter in a loop and wait for exit whenever `Ctrl + C` is pressed
+        '''
         rospy.spin()
 
 
     def create_marker(self, index, color, marker_type, size, time):
+        '''
+        Function to create a visualization marker which is used inside RViz
+        '''
         marker = Marker()
         marker.id = index
         marker.ns = self.ns
@@ -83,10 +93,21 @@ class RealtimeVisualization():
         marker.lifetime = rospy.Duration(0.1)  # 0.1 second
         return marker
 
-    def isValid(self, bodyPart):
-         return bodyPart.score > 0 and bodyPart.point.z > 0
 
-    def receive_skeleton_callback(self, data):
+    def isValid(self, bodyPart):
+        '''
+        When should we consider a body part as a valid entity?
+        We make sure that the score and z coordinate is a positive number.
+        Notice that the z coordinate denotes the distance of the object located
+        in front of the camera. Therefore it must be a positive number always.
+        '''
+        return bodyPart.score > 0 and bodyPart.point.z > 0
+
+
+    def frame_callback(self, data):
+        '''
+        This function will be called everytime whenever a message is received by the subscriber
+        '''
         marker_counter = 0
         person_counter = 1
         marker_array = MarkerArray()
@@ -108,7 +129,7 @@ class RealtimeVisualization():
             marker_counter += 1
             person_id = self.create_marker(marker_counter, marker_color, Marker.TEXT_VIEW_FACING, self.id_text_size, now)
 
-            # assign 3D positions
+            # assign 3D positions. make sure to consider only valid body parts
             upper_body.points = [person.bodyParts[idx].point for idx in self.upper_body_ids if self.isValid(person.bodyParts[idx])]
             hands.points = [person.bodyParts[idx].point for idx in self.hands_ids if self.isValid(person.bodyParts[idx])]
             legs.points = [person.bodyParts[idx].point for idx in self.legs_ids if self.isValid(person.bodyParts[idx])]
@@ -127,11 +148,8 @@ class RealtimeVisualization():
             # update the counter
             person_counter += 1
 
+        # publish the markers
         self.skeleton_pub.publish(marker_array)
-
-
-    def __del__(self):
-        self.skeleton_pub.unregister()
 
 
 if __name__ == '__main__':
@@ -140,10 +158,10 @@ if __name__ == '__main__':
 
     # initialize ros node
     rospy.init_node('visualization_node', anonymous=False)
-    body_topic = '/frame'
+    frame_topic = '/frame'
     skeleton_frame = 'camera_depth_optical_frame'
     id_text_size = 0.1
     skeleton_line_width = 0.01
 
-
-    RealtimeVisualization(ns, body_topic, skeleton_frame, id_text_size, skeleton_line_width)
+    visualization = RealtimeVisualization(ns, frame_topic, skeleton_frame, id_text_size, skeleton_line_width)
+    visualization.spin()
