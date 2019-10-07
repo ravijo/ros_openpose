@@ -14,12 +14,11 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 
 class RealtimeVisualization():
-    def __init__(self, ns, body_topic, skeleton_frame, id_text_size, skeleton_line_width, min_score):
+    def __init__(self, ns, body_topic, skeleton_frame, id_text_size, skeleton_line_width):
         self.ns = ns
         self.skeleton_frame = skeleton_frame
         self.id_text_size = id_text_size
         self.skeleton_line_width = skeleton_line_width
-        self.min_score = min_score
 
         # define the colors
         self.colors = [ColorRGBA(0.98, 0.30, 0.30, 1.00),
@@ -84,6 +83,8 @@ class RealtimeVisualization():
         marker.lifetime = rospy.Duration(0.1)  # 0.1 second
         return marker
 
+    def isValid(self, bodyPart):
+         return bodyPart.score > 0 and bodyPart.point.z > 0
 
     def receive_skeleton_callback(self, data):
         marker_counter = 0
@@ -108,19 +109,20 @@ class RealtimeVisualization():
             person_id = self.create_marker(marker_counter, marker_color, Marker.TEXT_VIEW_FACING, self.id_text_size, now)
 
             # assign 3D positions
-            upper_body.points = [person.bodyParts[idx].point for idx in self.upper_body_ids if person.bodyParts[idx].score > self.min_score]
-            hands.points = [person.bodyParts[idx].point for idx in self.hands_ids if person.bodyParts[idx].score > self.min_score]
-            legs.points = [person.bodyParts[idx].point for idx in self.legs_ids if person.bodyParts[idx].score > self.min_score]
+            upper_body.points = [person.bodyParts[idx].point for idx in self.upper_body_ids if self.isValid(person.bodyParts[idx])]
+            hands.points = [person.bodyParts[idx].point for idx in self.hands_ids if self.isValid(person.bodyParts[idx])]
+            legs.points = [person.bodyParts[idx].point for idx in self.legs_ids if self.isValid(person.bodyParts[idx])]
 
             # assign person id and 3D position
             person_id.text = str(person_counter)
-            nose_position = person.bodyParts[self.nose_id].point
-            person_id.pose.position = Point(nose_position.x, nose_position.y - 0.05, nose_position.z)
+            nose = person.bodyParts[self.nose_id]
+            if self.isValid(nose):
+                person_id.pose.position = Point(nose.point.x, nose.point.y - 0.05, nose.point.z)
+                marker_array.markers.append(person_id)
 
             marker_array.markers.append(upper_body)
             marker_array.markers.append(hands)
             marker_array.markers.append(legs)
-            marker_array.markers.append(person_id)
 
             # update the counter
             person_counter += 1
@@ -142,7 +144,6 @@ if __name__ == '__main__':
     skeleton_frame = 'camera_depth_optical_frame'
     id_text_size = 0.1
     skeleton_line_width = 0.01
-    min_score = 0.1
 
 
-    RealtimeVisualization(ns, body_topic, skeleton_frame, id_text_size, skeleton_line_width, min_score)
+    RealtimeVisualization(ns, body_topic, skeleton_frame, id_text_size, skeleton_line_width)

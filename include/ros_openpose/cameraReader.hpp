@@ -7,11 +7,11 @@
 #pragma once
 
 // ROS headers
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/image_encodings.h>
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
 
 // CV brigge header
 #include <cv_bridge/cv_bridge.h>
@@ -19,7 +19,8 @@
 // OpenCV header
 #include <opencv2/core/core.hpp>
 
-// c++ header
+// c++ headers
+#include <mutex>
 #include <vector>
 
 namespace ros_openpose
@@ -27,13 +28,12 @@ namespace ros_openpose
   class CameraReader
   {
   private:
-    cv::Mat mColorImage;
-    cv::Mat mDepthImage;
-    std::string mColorTopic;
-    std::string mDepthTopic;
-    std::string mCamInfoTopic;
+    cv::Mat mColorImage, mDepthImage;
+    cv::Mat mColorImageUsed, mDepthImageUsed;
+    std::string mColorTopic, mDepthTopic, mCamInfoTopic;
     ros::NodeHandle mNh;
     ros::Subscriber mCamInfoSubscriber;
+    std::mutex mMutex;
 
     // camera calibration parameters
     std::shared_ptr<sensor_msgs::CameraInfo> mSPtrCameraInfo;
@@ -60,12 +60,17 @@ namespace ros_openpose
                  const std::string& camInfoTopic);
 
     // destructor
-    ~CameraReader();
+    ~CameraReader() = default;
 
-    // get the color image from camera
+    // lock color frame. remember that we
+    // are just passing the pointer instead of copying whole data
+    // the function returns a color image from camera
     const cv::Mat& getColorFrame()
     {
-      return mColorImage;
+      mMutex.lock();
+      mColorImageUsed = mColorImage;
+      mMutex.unlock();
+      return mColorImageUsed;
     }
 
     // get the depth image from camera
@@ -74,18 +79,29 @@ namespace ros_openpose
       return mDepthImage;
     }
 
-    // compute pixel to 3D without considering distortion
+    // copy the latest depth image from camera. remember that we
+    // are just passing the pointer instead of copying whole data
+    void copyLatestDepthImage()
+    {
+      mMutex.lock();
+      mDepthImageUsed = mDepthImage;
+      mMutex.unlock();
+    }
+
+    // compute the point in 3D space for a given pixel without considering distortion
     void compute3DPoint(const float pixel_x, const float pixel_y, float (&point)[3])
     {
       /*
-      * K.at(0) = intrinsic.fx
-      * K.at(4) = intrinsic.fy
-      * K.at(2) = intrinsic.ppx
-      * K.at(5) = intrinsic.ppy
-      */
+       * K.at(0) = intrinsic.fx
+       * K.at(4) = intrinsic.fy
+       * K.at(2) = intrinsic.ppx
+       * K.at(5) = intrinsic.ppy
+       */
 
       // our depth image type is 16UC1 which has unsigned short as an underlying type
-      auto depth = mDepthImage.at<unsigned short>(static_cast<int>(pixel_y), static_cast<int>(pixel_x));
+      auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixel_y), static_cast<int>(pixel_x));
+      if (depth <= 0)
+        return;
 
       // convert to meter (SI units)
       auto depthSI = depth * 0.001f;

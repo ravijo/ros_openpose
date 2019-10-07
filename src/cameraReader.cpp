@@ -35,10 +35,10 @@ namespace ros_openpose
     return *this;
   }
 
-  CameraReader::~CameraReader()
-  {
-    // std::cout << "[" << this << "] destructor called" << std::endl;
-  }
+  // CameraReader::~CameraReader()
+  //{
+  //  std::cout << "[" << this << "] destructor called" << std::endl;
+  //}
 
   inline void CameraReader::subscribe()
   {
@@ -48,7 +48,7 @@ namespace ros_openpose
     int queueSize = 4;
 
     // clang-format off
-    mSPtrSyncSubscriber = std::make_shared<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image>>(
+    mSPtrSyncSubscriber = std::make_shared<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> >(
         *mSPtrColorImageSub,
         *mSPtrDepthImageSub,
         queueSize);
@@ -74,9 +74,12 @@ namespace ros_openpose
     try
     {
       // since we don't want to change the data, therefore we need not copy the image, we can just share it.
-      auto colorPtr = cv_bridge::toCvShare(colorMsg, sensor_msgs::image_encodings::BGR8);
-      auto depthPtr = cv_bridge::toCvShare(depthMsg, sensor_msgs::image_encodings::TYPE_16UC1);
+      // auto colorPtr = cv_bridge::toCvShare(colorMsg, sensor_msgs::image_encodings::BGR8);
 
+      auto colorPtr = cv_bridge::toCvCopy(colorMsg, sensor_msgs::image_encodings::BGR8);
+      auto depthPtr = cv_bridge::toCvCopy(depthMsg, sensor_msgs::image_encodings::TYPE_16UC1);
+
+      std::lock_guard<std::mutex> lock(mMutex);
       mColorImage = colorPtr->image;
       mDepthImage = depthPtr->image;
     }

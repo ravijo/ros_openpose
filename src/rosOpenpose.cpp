@@ -36,6 +36,8 @@ public:
   {
     try
     {
+      std::this_thread::sleep_for(std::chrono::microseconds{100});
+
       // get the latest color image from the camera
       auto& colorImage = mSPtrCameraReader->getColorFrame();
 
@@ -98,6 +100,9 @@ public:
 
         // make sure to clear previous data
         mFrame.persons.clear();
+
+        // we use the latest depth image for computing point in 3D space
+        mSPtrCameraReader->copyLatestDepthImage();
 
         // get the size
         const int personCount = poseKeypoints.getSize(0);
