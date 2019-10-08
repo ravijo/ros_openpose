@@ -1,5 +1,8 @@
 /**
-* cameraReader.cpp: class file for CameraReader
+* cameraReader.cpp: class file for CameraReader. the CameraReader file provides
+*                   functionality for retrieving color and depth images from the
+*                   depth sensor. it also reads the camera calibration parameters
+*                   via ROS subscriber.
 * Author: Ravi Joshi
 * Date: 2019/02/01
 */

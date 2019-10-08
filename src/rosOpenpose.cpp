@@ -1,5 +1,9 @@
 /**
-* rosOpenpose.cpp: the main file
+* rosOpenpose.cpp: the main file. it consists of two workers input and output worker.
+*                  the job of the input worker is to provide color images to openpose wrapper.
+*                  the job of the output worker is to receive the keypoints detected in 2D
+*                  space. it then converts 2D pixels to 3D coordinates (wrt camera coordinate
+*                  system)/
 * Author: Ravi Joshi
 * Date: 2019/09/27
 * src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/master/examples/tutorial_api_cpp
@@ -20,7 +24,7 @@
 typedef std::shared_ptr<op::Datum> sPtrDatum;
 typedef std::shared_ptr<std::vector<sPtrDatum>> sPtrVecSPtrDatum;
 
-// the input worker. the job of this worker is to provide color data to
+// the input worker. the job of this worker is to provide color imagees to
 // openpose wrapper
 class WUserInput : public op::WorkerProducer<sPtrVecSPtrDatum>
 {
@@ -39,7 +43,7 @@ public:
     {
       // just to make the CPU usage low
       // need to think of a better way instead.
-      std::this_thread::sleep_for(std::chrono::microseconds{100});
+      std::this_thread::sleep_for(std::chrono::milliseconds{1});
 
       // get the latest color image from the camera
       auto& colorImage = mSPtrCameraReader->getColorFrame();
@@ -75,16 +79,21 @@ private:
   const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
 };
 
-// the outpout worker. the job of this worker is to receive the keypoints detected in 2D
-// space. it then convert 2D pixels to 3D coordinates (wrt camera coordinate system)
+// the outpout worker. the job of the output worker is to receive the keypoints
+// detected in 2D space. it then converts 2D pixels to 3D coordinates (wrt
+// camera coordinate system).
 class WUserOutput : public op::WorkerConsumer<sPtrVecSPtrDatum>
 {
 public:
-  WUserOutput(const ros::Publisher& framePublisher, const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader)
+  // clang-format off
+  WUserOutput(const ros::Publisher& framePublisher,
+              const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader,
+              const std::string& frameId)
     : mFramePublisher(framePublisher), mSPtrCameraReader(sPtrCameraReader)
   {
-    mFrame.header.frame_id = "camera_depth_optical_frame";
+    mFrame.header.frame_id = frameId;
   }
+  // clang-format on
 
   void initializationOnThread()
   {
@@ -162,8 +171,12 @@ private:
   const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
 };
 
-void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpose::CameraReader>& cameraReader,
-                       const ros::Publisher& framePublisher)
+// clang-format off
+void configureOpenPose(op::Wrapper& opWrapper,
+                       const std::shared_ptr<ros_openpose::CameraReader>& cameraReader,
+                       const ros::Publisher& framePublisher,
+                       const std::string& frameId)
+// clang-format on
 {
   try
   {
@@ -226,7 +239,7 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
 
     // Initializing the user custom classes
     auto wUserInput = std::make_shared<WUserInput>(cameraReader);
-    auto wUserOutput = std::make_shared<WUserOutput>(framePublisher, cameraReader);
+    auto wUserOutput = std::make_shared<WUserOutput>(framePublisher, cameraReader, frameId);
 
     // Add custom processing
     const auto workerInputOnNewThread = true;
@@ -341,29 +354,42 @@ void configureOpenPose(op::Wrapper& opWrapper, const std::shared_ptr<ros_openpos
 
 int main(int argc, char* argv[])
 {
-  ros::init(argc, argv, "ros_openpose");
-  ros::NodeHandle nh;
-  // image_transport::ImageTransport it(nh);
+  ros::init(argc, argv, "ros_openpose_node");
+  ros::NodeHandle nh("~");
+
+  // define the parameters, we are going to read
+  std::string openposeModelDir, colorTopic, depthTopic, camInfoTopic, frameId, pubTopic;
+
+  // read the parameters from relative nodel handle
+  nh.getParam("openpose_model_dir", openposeModelDir);
+  nh.getParam("color_topic", colorTopic);
+  nh.getParam("depth_topic", depthTopic);
+  nh.getParam("cam_info_topic", camInfoTopic);
+  nh.getParam("frame_id", frameId);
+  nh.getParam("pub_topic", pubTopic);
+
+  if (openposeModelDir.empty())
+  {
+    ROS_FATAL("Missing 'openpose_model_dir' info in launch file");
+    exit(-1);
+  }
 
   // path of the dir where openpose models are located
-  FLAGS_model_folder = "/home/ravi/tools/openpose/models/";
+  FLAGS_model_folder = openposeModelDir;
 
   // parsing command line flags
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  const std::string colorTopic = "/camera/color/image_raw";
-  const std::string depthTopic = "/camera/aligned_depth_to_color/image_raw";
-  const std::string camInfoTopic = "/camera/color/camera_info";
   const auto cameraReader = std::make_shared<ros_openpose::CameraReader>(nh, colorTopic, depthTopic, camInfoTopic);
 
   // the frame consists of the location of detected body parts of each person
-  const ros::Publisher framePublisher = nh.advertise<ros_openpose::Frame>("frame", 1);
+  const ros::Publisher framePublisher = nh.advertise<ros_openpose::Frame>(pubTopic, 1);
 
   try
   {
     ROS_INFO("Starting ros_openpose...");
     op::Wrapper opWrapper;
-    configureOpenPose(opWrapper, cameraReader, framePublisher);
+    configureOpenPose(opWrapper, cameraReader, framePublisher, frameId);
 
     // start and run
     opWrapper.start();

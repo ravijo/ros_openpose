@@ -157,11 +157,14 @@ if __name__ == '__main__':
     ns = 'visualization'
 
     # initialize ros node
-    rospy.init_node('visualization_node', anonymous=False)
-    frame_topic = '/frame'
-    skeleton_frame = 'camera_depth_optical_frame'
-    id_text_size = 0.1
-    skeleton_line_width = 0.01
+    rospy.init_node('visualizer_node', anonymous=False)
 
+    # read the parameters from ROS launch file
+    frame_topic = rospy.get_param('~pub_topic')
+    skeleton_frame = rospy.get_param('~frame_id')
+    id_text_size = rospy.get_param('~id_text_size')
+    skeleton_line_width = rospy.get_param('~skeleton_line_width')
+
+    # instantiate the RealtimeVisualization class
     visualization = RealtimeVisualization(ns, frame_topic, skeleton_frame, id_text_size, skeleton_line_width)
     visualization.spin()
