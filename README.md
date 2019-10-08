@@ -13,13 +13,15 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 </p>
 
 
+## Dependencies
+1. [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+
+
+## Compilation
+1. Make sure to download the complete repository. Use `git clone https://github.com/ravijo/ros_openpose.git` or download zip as per your convenience.
+1. Invoke catkin tool inside ros workspace i.e., `catkin_make`
+
+
 ### Steps to run
-1. `source devel/setup.bash`
-1. `roslaunch realsense2_camera rs_camera.launch align_depth:=true filters:=pointcloud`
-1. `rosrun ros_openpose rosOpenpose`
-
-Standard OpenPose flags can be used as well. For example, to disable multi threading:
-```
-rosrun ros_openpose rosOpenpose --disable_multi_thread
-```
-
+1. Make sure that ROS env is sourced properly by executing the following command `source devel/setup.bash`
+1. Invoke the single launch file by executing the following command `roslaunch ros_openpose run.launch`
