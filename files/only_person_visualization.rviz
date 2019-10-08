@@ -31,9 +31,9 @@ Visualization Manager:
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /visualization
-      Name: MarkerArray
+      Name: Human Skeleton
       Namespaces:
-        visualization: true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
