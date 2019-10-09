@@ -41,8 +41,8 @@ public:
   {
     try
     {
-      // just to make the CPU usage low
-      // need to think of a better way instead.
+      // just to lower the CPU usage
+      // todo: need to think of a better way instead
       std::this_thread::sleep_for(std::chrono::milliseconds{1});
 
       // get the latest color image from the camera
