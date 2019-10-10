@@ -22,6 +22,11 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 1. Make sure to download the complete repository. Use `git clone https://github.com/ravijo/ros_openpose.git` or download zip as per your convenience.
 1. Invoke catkin tool inside ros workspace i.e., `catkin_make`
 
+The standard openpose command-line arguments are also supported. To do so, please set the value of `openpose_args` by editing the [run.launch](https://github.com/ravijo/ros_openpose/blob/70244a91459a8d5fe3e6ffc58c9767b4620ae88d/launch/run.launch#L15) file as shown below-
+
+```
+<arg name="openpose_args" value="--face --hand"/>
+```
 
 ### Steps to run
 1. Make sure that ROS env is sourced properly by executing the following command `source devel/setup.bash`
