@@ -38,9 +38,15 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 
 ## Steps to run
-1. Make sure that ROS env is sourced properly by executing the following command `source devel/setup.bash`
-1. Invoke the single launch file by executing the following command `roslaunch ros_openpose run.launch`
-
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```
+   source devel/setup.bash
+    ```
+1. Invoke the single launch file by executing the following command-
+    ```
+   roslaunch ros_openpose run.launch
+    ```
+    
 The standard openpose command-line arguments are also supported. To do so, please set the value of `openpose_args` by editing the [run.launch](https://github.com/ravijo/ros_openpose/blob/70244a91459a8d5fe3e6ffc58c9767b4620ae88d/launch/run.launch#L15) file as shown below-
 
 ```
