@@ -37,7 +37,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
 
 
-### Steps to run
+## Steps to run
 1. Make sure that ROS env is sourced properly by executing the following command `source devel/setup.bash`
 1. Invoke the single launch file by executing the following command `roslaunch ros_openpose run.launch`
 
@@ -47,7 +47,8 @@ The standard openpose command-line arguments are also supported. To do so, pleas
 <arg name="openpose_args" value="--face --hand"/>
 ```
 
-### Note
+
+## Note
 This package has been tested on the following environment configuration-
 
 | Name      | Value                                  |
