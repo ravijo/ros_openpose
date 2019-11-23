@@ -2,7 +2,8 @@
 
 ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
-:heavy_check_mark: Intel Realsense Camera
+- [x] Intel Realsense Camera :heavy_check_mark:
+- [x] Microsoft Kinect v2 Camera :heavy_check_mark:
 
 </br>
 
@@ -30,10 +31,10 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     ```
     In this case, please update the OpenPose. Most likely, an old version of OpenPose is installed. So please checkout Openpose from the master branch as [described here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#update-openpose). Alternatively, you can checkout OpenPose version 1.5.1 by running the following command at the root directory of OpenPose installation-
 
-        
+
        git checkout tags/v1.5.1
-        
-    
+
+
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
 
 
@@ -46,7 +47,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     ```
    roslaunch ros_openpose run.launch
     ```
-    
+
 The standard openpose command-line arguments are also supported. To do so, please set the value of `openpose_args` by editing the [run.launch](https://github.com/ravijo/ros_openpose/blob/70244a91459a8d5fe3e6ffc58c9767b4620ae88d/launch/run.launch#L15) file as shown below-
 
 ```
@@ -70,5 +71,3 @@ This package has been tested on the following environment configuration-
 | GPU       | GeForce GTX 1080                       |
 | CUDA      | Version 8.0.61                         |
 | cuDNN     | Version 5.1.10                         |
-
-
