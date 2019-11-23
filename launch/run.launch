@@ -12,7 +12,7 @@ Date: 2019/10/08
   <?ignore
     <arg name="openpose_args" value="--disable_multi_thread --model_folder /home/ravi/openpose/models/" />
   ?>
-  <arg name="openpose_args" value="--disable_multi_thread"/>
+  <arg name="openpose_args" value="--hand"/>
 
   <!-- set this flag to see the visualization inside RViz -->
   <arg name="rviz" default="true"/>

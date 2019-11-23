@@ -32,7 +32,7 @@ class RealtimeVisualization():
 
         '''
         The skeleton is considered as a combination of line strips.
-        Hence, the skeleton is decomposed into three LINE_STRIP as following:
+        Hence, the skeleton is decomposed into 3 LINE_STRIP as following:
             1) upper_body : from nose to mid hip
             2) hands : from left-hand wrist to right-hand wrist
             3) legs : from left foot toe to right foot toe
@@ -54,6 +54,11 @@ class RealtimeVisualization():
             {10,     "RKnee"},    {23,  "RSmallToe"}
             {11,    "RAnkle"},    {24,      "RHeel"}
             {12,      "LHip"},    {25, "Background"}
+
+
+        hand output ordering
+        src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/raw/master/doc/media/keypoints_hand.png
+        We are using 5 LINE_STRIP to draw a hand
         '''
 
         self.upper_body_ids = [0, 1, 8]
