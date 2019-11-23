@@ -1,83 +1,11 @@
 <?xml version="1.0"?>
 <!--
-run.launch
+run.launch: this file does no more than calling other file
 Author: Ravi Joshi
-Date: 2019/10/08
+Date: 2019/11/23
 -->
 <launch>
-  <!--
-  the standard openpose command-line arguments are also supported.
-  to do so, please change the value as shown below.
-  -->
-  <?ignore
-    <arg name="openpose_args" value="--disable_multi_thread --model_folder /home/ravi/openpose/models/" />
-  ?>
-  <arg name="openpose_args" value="--hand"/>
-
-  <!-- set this flag to see the visualization inside RViz -->
-  <arg name="rviz" default="true"/>
-
-  <!-- set this flag to see the pointcloud in the visualization inside RViz  -->
-  <arg name="pointcloud" default="true"/>
-
-  <!-- full path to the model dir of openpose -->
-  <arg name="openpose_model_dir" default="/home/ravi/tools/openpose/models/"/>
-
-  <!-- rostopic to subscribe for color images -->
-  <arg name="color_topic" default="/camera/color/image_raw"/>
-
-  <!-- rostopic to subscribe for depth images -->
-  <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
-
-  <!-- rostopic to subscribe for camera calibration parameters -->
-  <arg name="cam_info_topic" default="/camera/color/camera_info"/>
-
-  <!-- frame id for point cloud and 3D skeleton data -->
-  <arg name="frame_id" default="camera_color_optical_frame"/>
-
-  <!-- rostopic to publish the 3D skeleton data -->
-  <arg name="pub_topic" default="/frame"/>
-
-  <!-- thickness of the line used to draw skeleton for visualization inside RViz -->
-  <arg name="skeleton_line_width" default="0.01"/>
-
-  <!-- size of the text used to indicate the id of a skeleton for visualization inside RViz -->
-  <arg name="id_text_size" default="0.2"/>
-
-  <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenpose" output="screen" required="true" args="$(arg openpose_args)">
-    <param name="openpose_model_dir" value="$(arg openpose_model_dir)" />
-    <param name="color_topic" value="$(arg color_topic)" />
-    <param name="depth_topic" value="$(arg depth_topic)" />
-    <param name="cam_info_topic" value="$(arg cam_info_topic)" />
-    <param name="frame_id" value="$(arg frame_id)" />
-    <param name="pub_topic" value="$(arg pub_topic)" />
-  </node>
-
-  <group if="$(arg rviz)">
-    <node name="visualizer" pkg="ros_openpose" type="visualizer.py" output="screen">
-      <param name="pub_topic" value="$(arg pub_topic)"/>
-      <param name="frame_id" value="$(arg frame_id)"/>
-      <param name="skeleton_line_width" value="$(arg skeleton_line_width)"/>
-      <param name="id_text_size" value="$(arg id_text_size)"/>
-    </node>
-  </group>
-
-  <group if="$(arg pointcloud)">
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-      <arg name="align_depth" value="true"/>
-      <arg name="filters" value="pointcloud"/>
-    </include>
-    <group if="$(arg rviz)">
-      <node pkg="rviz" type="rviz" respawn="false" required="true" name="rviz" args="-d $(find ros_openpose)/files/pointcloud_person_visualization.rviz"/>
-    </group>
-  </group>
-
-  <group unless="$(arg pointcloud)">
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-      <arg name="align_depth" value="true"/>
-    </include>
-    <group if="$(arg rviz)">
-      <node pkg="rviz" type="rviz" respawn="false" required="true" name="rviz" args="-d $(find ros_openpose)/files/only_person_visualization.rviz"/>
-    </group>
-  </group>
+  <!-- supported camera (so far it can only be either realsense or kinect) -->
+  <arg name="camera" default="realsense"/>
+  <include file="$(find ros_openpose)/launch/run_$(arg camera).launch"/>
 </launch>
