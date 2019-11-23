@@ -20,9 +20,9 @@ class RealtimeVisualization():
         self.id_text_size = id_text_size
         self.skeleton_line_width = skeleton_line_width
 
-        # define the colors
-        self.colors = [ColorRGBA(0.98, 0.30, 0.30, 1.00),
-                       ColorRGBA(0.12, 0.63, 0.42, 1.00),
+        # define a few colors we are going to use later on
+        self.colors = [ColorRGBA(0.12, 0.63, 0.42, 1.00),
+                       ColorRGBA(0.98, 0.30, 0.30, 1.00),
                        ColorRGBA(0.26, 0.09, 0.91, 1.00),
                        ColorRGBA(0.77, 0.44, 0.14, 1.00),
                        ColorRGBA(0.92, 0.73, 0.14, 1.00),
@@ -64,6 +64,14 @@ class RealtimeVisualization():
         self.upper_body_ids = [0, 1, 8]
         self.hands_ids = [4, 3, 2, 1, 5, 6, 7]
         self.legs_ids = [22, 11, 10, 9, 8, 12, 13, 14, 19]
+
+        # number of fingers in a hand
+        self.fingers = 5
+
+        # number of keypoints to denote a finger
+        self.count_keypoints_one_finger = 5
+
+        self.total_finger_kepoints = self.fingers * self.count_keypoints_one_finger
 
         # write person id on the top of his head
         self.nose_id = 0
@@ -114,33 +122,58 @@ class RealtimeVisualization():
         This function will be called everytime whenever a message is received by the subscriber
         '''
         marker_counter = 0
-        person_counter = 1
+        person_index = 0
         marker_array = MarkerArray()
 
         for person in data.persons:
             now = rospy.Time.now()
-            person_counter = 1 if person_counter >= len(self.colors) else person_counter
-            marker_color = self.colors[person_counter]
+            marker_color = self.colors[person_index % len(self.colors)]
 
-            marker_counter += 1
+            #marker_counter += 1
             upper_body = self.create_marker(marker_counter, marker_color, Marker.LINE_STRIP, self.skeleton_line_width, now)
-
             marker_counter += 1
+
             hands = self.create_marker(marker_counter, marker_color, Marker.LINE_STRIP, self.skeleton_line_width, now)
-
             marker_counter += 1
+
             legs = self.create_marker(marker_counter, marker_color, Marker.LINE_STRIP, self.skeleton_line_width, now)
-
             marker_counter += 1
+
             person_id = self.create_marker(marker_counter, marker_color, Marker.TEXT_VIEW_FACING, self.id_text_size, now)
+            marker_counter += 1
+
+            left_hand = [self.create_marker(marker_counter + idx, marker_color, Marker.LINE_STRIP, self.skeleton_line_width, now) for idx in range(self.fingers)]
+            marker_counter += self.fingers
+
+            right_hand = [self.create_marker(marker_counter + idx, marker_color, Marker.LINE_STRIP, self.skeleton_line_width, now) for idx in range(self.fingers)]
+            marker_counter += self.fingers
 
             # assign 3D positions. make sure to consider only valid body parts
             upper_body.points = [person.bodyParts[idx].point for idx in self.upper_body_ids if self.isValid(person.bodyParts[idx])]
             hands.points = [person.bodyParts[idx].point for idx in self.hands_ids if self.isValid(person.bodyParts[idx])]
             legs.points = [person.bodyParts[idx].point for idx in self.legs_ids if self.isValid(person.bodyParts[idx])]
 
+            keypoint_counter = 0
+            for idx in range(self.total_finger_kepoints):
+                strip_id = idx / self.count_keypoints_one_finger
+                temp_id = idx % self.count_keypoints_one_finger
+                if temp_id == 0:
+                    point_id = temp_id
+                else:
+                    keypoint_counter += 1
+                    point_id = keypoint_counter
+
+                leftHandPart = person.leftHandParts[point_id]
+                rightHandPart = person.rightHandParts[point_id]
+                if self.isValid(leftHandPart):
+                    left_hand[strip_id].points.append(leftHandPart.point)
+
+                if self.isValid(rightHandPart):
+                    right_hand[strip_id].points.append(rightHandPart.point)
+
+
             # assign person id and 3D position
-            person_id.text = str(person_counter)
+            person_id.text = str(person_index)
             nose = person.bodyParts[self.nose_id]
             if self.isValid(nose):
                 person_id.pose.position = Point(nose.point.x, nose.point.y - 0.05, nose.point.z)
@@ -149,9 +182,11 @@ class RealtimeVisualization():
             marker_array.markers.append(upper_body)
             marker_array.markers.append(hands)
             marker_array.markers.append(legs)
+            marker_array.markers.extend(left_hand)
+            marker_array.markers.extend(right_hand)
 
             # update the counter
-            person_counter += 1
+            person_index += 1
 
         # publish the markers
         self.skeleton_pub.publish(marker_array)
