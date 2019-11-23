@@ -9,6 +9,8 @@
 * src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/master/examples/tutorial_api_cpp
 */
 
+// todo: merge the 'for' loop for body and hand keypoints into one
+
 // ROS headers
 #include <ros/ros.h>
 
