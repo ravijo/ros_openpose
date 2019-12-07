@@ -7,5 +7,16 @@ Date: 2019/11/23
 <launch>
   <!-- supported camera (so far it can only be either realsense or kinect) -->
   <arg name="camera" default="realsense"/>
-  <include file="$(find ros_openpose)/launch/run_$(arg camera).launch"/>
+
+  <!-- set this flag to see invoke RViz -->
+  <arg name="rviz" default="true"/>
+
+  <!-- set this flag to invoke the visualization -->
+  <arg name="skeleton" default="true"/>
+  
+  <include file="$(find ros_openpose)/launch/run_$(arg camera).launch">
+    <arg name="rviz" value="$(arg rviz)"/>
+    <arg name="skeleton" value="$(arg skeleton)"/>
+  </include>
+
 </launch>

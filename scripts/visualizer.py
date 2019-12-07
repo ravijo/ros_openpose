@@ -6,6 +6,7 @@
 # Date: 2019/10/01
 
 # import modules
+import math
 import rospy
 from ros_openpose.msg import Frame
 from std_msgs.msg import ColorRGBA
@@ -114,7 +115,7 @@ class RealtimeVisualization():
         Notice that the z coordinate denotes the distance of the object located
         in front of the camera. Therefore it must be a positive number always.
         '''
-        return bodyPart.score > 0 and bodyPart.point.z > 0
+        return bodyPart.score > 0 and not math.isnan(bodyPart.point.x) and not math.isnan(bodyPart.point.y) and not math.isnan(bodyPart.point.z) and bodyPart.point.z > 0
 
 
     def frame_callback(self, data):

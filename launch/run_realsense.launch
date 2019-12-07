@@ -14,8 +14,11 @@ Date: 2019/10/08
   ?>
   <arg name="openpose_args" value="--hand"/>
 
-  <!-- set this flag to see the visualization inside RViz -->
+  <!-- set this flag to see invoke RViz -->
   <arg name="rviz" default="true"/>
+
+  <!-- set this flag to invoke the visualization -->
+  <arg name="skeleton" default="true"/>
 
   <!-- set this flag to see the pointcloud in the visualization inside RViz  -->
   <arg name="pointcloud" default="true"/>
@@ -33,7 +36,7 @@ Date: 2019/10/08
   <arg name="cam_info_topic" default="/camera/color/camera_info"/>
 
   <!-- frame id for point cloud and 3D skeleton data -->
-  <arg name="frame_id" default="camera_color_optical_frame"/>
+  <arg name="frame_id" default="camera_depth_optical_frame"/>
 
   <!-- rostopic to publish the 3D skeleton data -->
   <arg name="pub_topic" default="/frame"/>
@@ -53,7 +56,7 @@ Date: 2019/10/08
     <param name="pub_topic" value="$(arg pub_topic)" />
   </node>
 
-  <group if="$(arg rviz)">
+  <group if="$(arg skeleton)">
     <node name="visualizer" pkg="ros_openpose" type="visualizer.py" output="screen">
       <param name="pub_topic" value="$(arg pub_topic)"/>
       <param name="frame_id" value="$(arg frame_id)"/>

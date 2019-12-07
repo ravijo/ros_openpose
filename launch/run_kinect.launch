@@ -14,8 +14,11 @@ Date: 2019/11/23
   ?>
   <arg name="openpose_args" value="--hand"/>
 
-  <!-- set this flag to see the visualization inside RViz -->
+  <!-- set this flag to see invoke RViz -->
   <arg name="rviz" default="true"/>
+
+  <!-- set this flag to invoke the visualization -->
+  <arg name="skeleton" default="true"/>
 
   <!-- set this flag to see the pointcloud in the visualization inside RViz  -->
   <arg name="pointcloud" default="true"/>
@@ -53,7 +56,7 @@ Date: 2019/11/23
     <param name="pub_topic" value="$(arg pub_topic)" />
   </node>
 
-  <group if="$(arg rviz)">
+  <group if="$(arg skeleton)">
     <node name="visualizer" pkg="ros_openpose" type="visualizer.py" output="screen">
       <param name="pub_topic" value="$(arg pub_topic)"/>
       <param name="frame_id" value="$(arg frame_id)"/>
