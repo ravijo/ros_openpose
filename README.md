@@ -53,7 +53,7 @@ The standard openpose command-line arguments are also supported. To do so, pleas
 ```
 <arg name="openpose_args" value="--face --hand"/>
 ```
-
+_The above configuration is moved to `run_kinect.launch` and `run_realsense.launch` file. Kindly edit the necessary file._
 
 ## Note
 This package has been tested on the following environment configuration-
