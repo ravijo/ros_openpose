@@ -20,6 +20,9 @@ Date: 2019/10/08
   <!-- set this flag to invoke the visualization -->
   <arg name="skeleton" default="true"/>
 
+  <!-- set this flag to invoke the visualization of the hands of the skeleton -->
+  <arg name="skeleton_hands" default="true"/>
+
   <!-- set this flag to see the pointcloud in the visualization inside RViz  -->
   <arg name="pointcloud" default="true"/>
 
@@ -62,6 +65,7 @@ Date: 2019/10/08
       <param name="frame_id" value="$(arg frame_id)"/>
       <param name="skeleton_line_width" value="$(arg skeleton_line_width)"/>
       <param name="id_text_size" value="$(arg id_text_size)"/>
+      <param name="skeleton_hands" value="$(arg skeleton_hands)"/>
     </node>
   </group>
 

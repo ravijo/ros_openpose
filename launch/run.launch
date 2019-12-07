@@ -11,12 +11,16 @@ Date: 2019/11/23
   <!-- set this flag to see invoke RViz -->
   <arg name="rviz" default="true"/>
 
-  <!-- set this flag to invoke the visualization -->
+  <!-- set this flag to invoke the visualization of the skeleton -->
   <arg name="skeleton" default="true"/>
-  
+
+  <!-- set this flag to invoke the visualization of the hands of the skeleton -->
+  <arg name="skeleton_hands" default="true"/>
+
   <include file="$(find ros_openpose)/launch/run_$(arg camera).launch">
     <arg name="rviz" value="$(arg rviz)"/>
     <arg name="skeleton" value="$(arg skeleton)"/>
+    <arg name="skeleton_hands" value="$(arg skeleton_hands)"/>
   </include>
 
 </launch>
