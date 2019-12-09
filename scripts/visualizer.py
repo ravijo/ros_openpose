@@ -15,12 +15,13 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 
 class RealtimeVisualization():
-    def __init__(self, ns, frame_topic, skeleton_frame, id_text_size, skeleton_hands, skeleton_line_width):
+    def __init__(self, ns, frame_topic, skeleton_frame, id_text_size, id_text_offset, skeleton_hands, skeleton_line_width):
         self.ns = ns
         self.skeleton_frame = skeleton_frame
         self.id_text_size = id_text_size
-        self.skeleton_line_width = skeleton_line_width
+        self.id_text_offset = id_text_offset
         self.skeleton_hands = skeleton_hands
+        self.skeleton_line_width = skeleton_line_width
 
         # define a few colors we are going to use later on
         self.colors = [ColorRGBA(0.12, 0.63, 0.42, 1.00),
@@ -165,7 +166,7 @@ class RealtimeVisualization():
                     rightHandPart = person.rightHandParts[point_id]
                     if self.isValid(leftHandPart):
                         left_hand[strip_id].points.append(leftHandPart.point)
-                        
+
                     if self.isValid(rightHandPart):
                         right_hand[strip_id].points.append(rightHandPart.point)
                 marker_array.markers.extend(left_hand)
@@ -177,7 +178,7 @@ class RealtimeVisualization():
             person_id.text = str(person_counter)
             nose = person.bodyParts[self.nose_id]
             if self.isValid(nose):
-                person_id.pose.position = Point(nose.point.x, nose.point.y - 0.05, nose.point.z)
+                person_id.pose.position = Point(nose.point.x, nose.point.y + self.id_text_offset, nose.point.z)
                 marker_array.markers.append(person_id)
 
             # update the counter
@@ -198,9 +199,10 @@ if __name__ == '__main__':
     frame_topic = rospy.get_param('~pub_topic')
     skeleton_frame = rospy.get_param('~frame_id')
     id_text_size = rospy.get_param('~id_text_size')
+    id_text_offset = rospy.get_param('~id_text_offset')
     skeleton_hands = rospy.get_param('~skeleton_hands')
     skeleton_line_width = rospy.get_param('~skeleton_line_width')
 
     # instantiate the RealtimeVisualization class
-    visualization = RealtimeVisualization(ns, frame_topic, skeleton_frame, id_text_size, skeleton_hands, skeleton_line_width)
+    visualization = RealtimeVisualization(ns, frame_topic, skeleton_frame, id_text_size, id_text_offset, skeleton_hands, skeleton_line_width)
     visualization.spin()
