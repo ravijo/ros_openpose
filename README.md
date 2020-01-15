@@ -71,3 +71,7 @@ This package has been tested on the following environment configuration-
 | GPU       | GeForce GTX 1080                       |
 | CUDA      | Version 8.0.61                         |
 | cuDNN     | Version 5.1.10                         |
+
+
+## Issues (or Error Reporting)
+Please check [here](https://github.com/ravijo/ros_openpose/issues) and create issues accordingly.
