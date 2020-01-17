@@ -50,6 +50,9 @@ Date: 2019/11/23
   <!-- size of the text used to indicate the id of a skeleton for visualization inside RViz -->
   <arg name="id_text_size" default="0.2"/>
 
+  <!-- offeset of the text used to indicate the id of a skeleton for visualization inside RViz -->
+  <arg name="id_text_offset" default="-0.05"/>
+  
   <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenpose" output="screen" required="true" args="$(arg openpose_args)">
     <param name="openpose_model_dir" value="$(arg openpose_model_dir)" />
     <param name="color_topic" value="$(arg color_topic)" />
@@ -65,6 +68,7 @@ Date: 2019/11/23
       <param name="frame_id" value="$(arg frame_id)"/>
       <param name="skeleton_line_width" value="$(arg skeleton_line_width)"/>
       <param name="id_text_size" value="$(arg id_text_size)"/>
+      <param name="id_text_offset" value="$(arg id_text_offset)"/>
       <param name="skeleton_hands" value="$(arg skeleton_hands)"/>
     </node>
   </group>
