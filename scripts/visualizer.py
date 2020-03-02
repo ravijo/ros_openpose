@@ -195,7 +195,7 @@ if __name__ == '__main__':
     # initialize ros node
     rospy.init_node('visualizer_node', anonymous=False)
 
-    # read the parameters from ROS launch file
+    # read the parameters from ROS parameter server
     frame_topic = rospy.get_param('~pub_topic')
     skeleton_frame = rospy.get_param('~frame_id')
     id_text_size = rospy.get_param('~id_text_size')
