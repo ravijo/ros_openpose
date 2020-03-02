@@ -33,17 +33,21 @@ namespace ros_openpose
     std::string mColorTopic, mDepthTopic, mCamInfoTopic;
     ros::NodeHandle mNh;
     ros::Subscriber mCamInfoSubscriber;
+    ros::Subscriber mColorImgSubscriber;
+    ros::Subscriber mDepthImgSubscriber;
     std::mutex mMutex;
 
     // camera calibration parameters
     std::shared_ptr<sensor_msgs::CameraInfo> mSPtrCameraInfo;
-    std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrColorImageSub;
-    std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrDepthImageSub;
-    std::shared_ptr<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image>> mSPtrSyncSubscriber;
+    // std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrColorImageSub;
+    // std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrDepthImageSub;
+    // std::shared_ptr<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image>> mSPtrSyncSubscriber;
 
     inline void subscribe();
-    void imageCallback(const sensor_msgs::ImageConstPtr& colorMsg, const sensor_msgs::ImageConstPtr& depthMsg);
+    // void imageCallback(const sensor_msgs::ImageConstPtr& colorMsg, const sensor_msgs::ImageConstPtr& depthMsg);
     void camInfoCallback(const sensor_msgs::CameraInfoConstPtr& camMsg);
+    void colorImgCallback(const sensor_msgs::ImageConstPtr& colorMsg);
+    void depthImgCallback(const sensor_msgs::ImageConstPtr& depthMsg);
 
   public:
     // we don't want to instantiate using deafult constructor
@@ -62,7 +66,7 @@ namespace ros_openpose
     // we are okay with default destructor
     ~CameraReader() = default;
 
-    // returns the latest color image from camera
+    // returns the latest color frame from camera
     // it locks the color frame. remember that we
     // are just passing the pointer instead of copying whole data
     const cv::Mat& getColorFrame()
@@ -73,15 +77,30 @@ namespace ros_openpose
       return mColorImageUsed;
     }
 
-    // get the depth image from camera
-    // unsafe to call this function
-    // todo: remove this function
-    const cv::Mat& getDepthFrame()
+    // returns the latest color frame from camera
+    // it locks the color and depth frame from camera. remember that we
+    // are just passing the pointer instead of copying whole data
+    const cv::Mat& getColorFrameAndStoreDepthFrame()
     {
-      return mDepthImage;
+      mMutex.lock();
+      mColorImageUsed = mColorImage;
+      mDepthImageUsed = mDepthImage;
+      mMutex.unlock();
+      return mColorImageUsed;
     }
 
-    // copy the latest depth image from camera. remember that we
+    // returns the latest depth frame from camera
+    // it locks the depth frame. remember that we
+    // are just passing the pointer instead of copying whole data
+    const cv::Mat& getDepthFrame()
+    {
+      mMutex.lock();
+      mDepthImageUsed = mDepthImage;
+      mMutex.unlock();
+      return mDepthImageUsed;
+    }
+
+    // copy the latest depth frame from camera. remember that we
     // are just passing the pointer instead of copying whole data
     void copyLatestDepthImage()
     {
@@ -100,7 +119,7 @@ namespace ros_openpose
        * K.at(5) = intrinsic.ppy
        */
 
-      // our depth image type is 16UC1 which has unsigned short as an underlying type
+      // our depth frame type is 16UC1 which has unsigned short as an underlying type
       auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixel_y), static_cast<int>(pixel_x));
 
       // no need to proceed further if the depth is zero
