@@ -17,7 +17,8 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 ## Dependencies
 1. [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
-1. [realsense-ros](https://github.com/IntelRealSense/realsense-ros)
+
+_Additionally camera specific ROS drivers such as [realsense-ros](https://github.com/IntelRealSense/realsense-ros), [iai_kinect2](https://github.com/code-iai/iai_kinect2) etc are required as per your camera model._
 
 
 ## Compilation
