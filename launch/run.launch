@@ -1,26 +1,63 @@
 <?xml version="1.0"?>
 <!--
-run.launch: this file does no more than calling other file
+run.launch: this file does no more than calling other launch file
 Author: Ravi Joshi
 Date: 2019/11/23
 -->
 <launch>
-  <!-- supported camera (so far it can only be either realsense or kinect) -->
-  <arg name="camera" default="realsense"/>
+  <!-- the value of this argument can only be one of the following: realsense, kinect, nodepth -->
+  <arg name="camera" default="realsense" />
 
   <!-- set this flag to see invoke RViz -->
-  <arg name="rviz" default="true"/>
+  <arg name="rviz" default="true" />
 
   <!-- set this flag to invoke the visualization of the skeleton -->
-  <arg name="skeleton" default="true"/>
+  <arg name="skeleton" default="true" />
+
+  <!-- set this flag to see the pointcloud in the visualization inside RViz  -->
+  <arg name="pointcloud" default="true" />
 
   <!-- set this flag to invoke the visualization of the hands of the skeleton -->
-  <arg name="skeleton_hands" default="true"/>
+  <arg name="skeleton_hands" default="false" />
 
-  <include file="$(find ros_openpose)/launch/run_$(arg camera).launch">
-    <arg name="rviz" value="$(arg rviz)"/>
-    <arg name="skeleton" value="$(arg skeleton)"/>
-    <arg name="skeleton_hands" value="$(arg skeleton_hands)"/>
+  <!--
+  the standard openpose command-line arguments are also supported.
+  to do so, please change the value as shown below.
+  -->
+  <?ignore
+    <arg name="openpose_args" value="--hand --disable_multi_thread --model_folder /home/ravi/openpose/models/" />
+  ?>
+  <arg name="openpose_args" value="" />
+
+  <!-- full path to the model dir of openpose -->
+  <arg name="openpose_model_dir" default="/home/ravi/tools/openpose/models/" />
+
+  <!-- rostopic to publish the 3D skeleton data -->
+  <arg name="pub_topic" default="/frame" />
+
+  <!-- thickness of the line used to draw skeleton for visualization inside RViz -->
+  <arg name="skeleton_line_width" default="0.01" />
+
+  <!-- size of the text used to indicate the id of a skeleton for visualization inside RViz -->
+  <arg name="id_text_size" default="0.2" />
+
+  <!-- offeset of the text used to indicate the id of a skeleton for visualization inside RViz -->
+  <arg name="id_text_offset" default="-0.05" />
+
+  <!-- flag to enable printing ros message to terminal -->
+  <arg name="print" default="true" />
+
+  <include file="$(find ros_openpose)/launch/config_$(arg camera).launch" >
+    <arg name="rviz" value="$(arg rviz)" />
+    <arg name="print" value="$(arg print)" />
+    <arg name="skeleton" value="$(arg skeleton)" />
+    <arg name="pub_topic" value="$(arg pub_topic)" />
+    <arg name="pointcloud" value="$(arg pointcloud)" />
+    <arg name="id_text_size" value="$(arg id_text_size)" />
+    <arg name="openpose_args" value="$(arg openpose_args)" />
+    <arg name="skeleton_hands" value="$(arg skeleton_hands)" />
+    <arg name="id_text_offset" value="$(arg id_text_offset)" />
+    <arg name="openpose_model_dir" value="$(arg openpose_model_dir)" />
+    <arg name="skeleton_line_width" value="$(arg skeleton_line_width)" />
   </include>
-
 </launch>
