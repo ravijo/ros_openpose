@@ -4,6 +4,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 - [x] Intel Realsense Camera :heavy_check_mark:
 - [x] Microsoft Kinect v2 Camera :heavy_check_mark:
+- [x] Any color camera such as webcam etc :heavy_check_mark:
 
 </br>
 
@@ -48,12 +49,28 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
    roslaunch ros_openpose run.launch
     ```
 
-The standard openpose command-line arguments are also supported. To do so, please set the value of `openpose_args` by editing the [run.launch](https://github.com/ravijo/ros_openpose/blob/70244a91459a8d5fe3e6ffc58c9767b4620ae88d/launch/run.launch#L15) file as shown below-
+The standard openpose command-line arguments are also supported. To do so, please set the value of `openpose_args` by editing the [run.launch](https://github.com/ravijo/ros_openpose/blob/98e928c883474eace8c71f588b74bf25666ee9ca/launch/run.launch#L30) file as shown below-
 
 ```
 <arg name="openpose_args" value="--face --hand"/>
 ```
-_The above configuration is moved to `run_kinect.launch` and `run_realsense.launch` file. Kindly edit the necessary file._
+
+## Run with Intel Realsense Camera
+```
+roslaunch ros_openpose run.launch camera:=realsense
+```
+
+## Run with Microsoft Kinect v2 Camera
+```
+roslaunch ros_openpose run.launch camera:=kinect
+```
+
+## Run with Any color Camera such as Webcam etc
+```
+roslaunch ros_openpose run.launch camera:=nodepth
+```
+
+
 
 ## Note
 This package has been tested on the following environment configuration-
