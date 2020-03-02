@@ -48,7 +48,7 @@ public:
       std::this_thread::sleep_for(std::chrono::milliseconds{1});
 
       // get the latest color image from the camera
-      auto& colorImage = mSPtrCameraReader->getColorFrame();
+      auto& colorImage = mSPtrCameraReader->getColorFrameAndStoreDepthFrame();
 
       if (!colorImage.empty())
       {
@@ -72,7 +72,8 @@ public:
     catch (const std::exception& e)
     {
       this->stop();
-      ROS_ERROR("Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+      // display the error at most once per 10 seconds
+      ROS_ERROR_THROTTLE(10, "Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
       return nullptr;
     }
   }
@@ -90,8 +91,8 @@ public:
   // clang-format off
   WUserOutput(const ros::Publisher& framePublisher,
               const std::shared_ptr<ros_openpose::CameraReader>& sPtrCameraReader,
-              const std::string& frameId)
-    : mFramePublisher(framePublisher), mSPtrCameraReader(sPtrCameraReader)
+              const std::string& frameId, const bool noDepth)
+    : mFramePublisher(framePublisher), mSPtrCameraReader(sPtrCameraReader), mNoDepth(noDepth)
   {
     mFrame.header.frame_id = frameId;
   }
@@ -104,7 +105,7 @@ public:
   template <typename Array>
   void fillBodyROSMsg(Array& poseKeypoints, int person, int bodyPartCount)
   {
-#pragma omp parallel for
+    #pragma omp parallel for
     for (auto bodyPart = 0; bodyPart < bodyPartCount; bodyPart++)
     {
       // src:
@@ -116,7 +117,9 @@ public:
       const auto score = poseKeypoints[baseIndex + 2];
 
       float point3D[3];
-      mSPtrCameraReader->compute3DPoint(x, y, point3D);
+      // compute 3D point only if depth flag is set
+      if (!mNoDepth)
+        mSPtrCameraReader->compute3DPoint(x, y, point3D);
 
       mFrame.persons[person].bodyParts[bodyPart].pixel.x = x;
       mFrame.persons[person].bodyParts[bodyPart].pixel.y = y;
@@ -130,7 +133,7 @@ public:
   template <typename ArrayOfArray>
   void fillHandROSMsg(ArrayOfArray& handKeypoints, int person, int handPartCount)
   {
-#pragma omp parallel for
+    #pragma omp parallel for
     for (auto handPart = 0; handPart < handPartCount; handPart++)
     {
       const auto baseIndex = handKeypoints[0].getSize(2) * (person * handPartCount + handPart);
@@ -146,10 +149,14 @@ public:
       const auto scoreRight = handKeypoints[1][baseIndex + 2];
 
       float point3DLeft[3];
-      mSPtrCameraReader->compute3DPoint(xLeft, yLeft, point3DLeft);
-
       float point3DRight[3];
-      mSPtrCameraReader->compute3DPoint(xRight, yRight, point3DRight);
+
+      // compute 3D point only if depth flag is set
+      if (!mNoDepth)
+      {
+        mSPtrCameraReader->compute3DPoint(xLeft, yLeft, point3DLeft);
+        mSPtrCameraReader->compute3DPoint(xRight, yRight, point3DRight);
+      }
 
       mFrame.persons[person].leftHandParts[handPart].pixel.x = xLeft;
       mFrame.persons[person].leftHandParts[handPart].pixel.y = yLeft;
@@ -180,11 +187,10 @@ public:
         mFrame.persons.clear();
 
         // we use the latest depth image for computing point in 3D space
-        mSPtrCameraReader->copyLatestDepthImage();
+        // mSPtrCameraReader->copyLatestDepthImage();
 
         // accesing each element of the keypoints
         const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
-
         const auto& handKeypoints = datumsPtr->at(0)->handKeypoints;
 
         // get the size
@@ -216,6 +222,7 @@ public:
   }
 
 private:
+  const bool mNoDepth;
   ros_openpose::Frame mFrame;
   const ros::Publisher mFramePublisher;
   const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
@@ -225,7 +232,7 @@ private:
 void configureOpenPose(op::Wrapper& opWrapper,
                        const std::shared_ptr<ros_openpose::CameraReader>& cameraReader,
                        const ros::Publisher& framePublisher,
-                       const std::string& frameId)
+                       const std::string& frameId, const bool noDepth)
 // clang-format on
 {
   try
@@ -289,7 +296,7 @@ void configureOpenPose(op::Wrapper& opWrapper,
 
     // Initializing the user custom classes
     auto wUserInput = std::make_shared<WUserInput>(cameraReader);
-    auto wUserOutput = std::make_shared<WUserOutput>(framePublisher, cameraReader, frameId);
+    auto wUserOutput = std::make_shared<WUserOutput>(framePublisher, cameraReader, frameId, noDepth);
 
     // Add custom processing
     const auto workerInputOnNewThread = true;
@@ -408,19 +415,21 @@ int main(int argc, char* argv[])
   ros::NodeHandle nh("~");
 
   // define the parameters, we are going to read
+  bool noDepth;
   std::string openposeModelDir, colorTopic, depthTopic, camInfoTopic, frameId, pubTopic;
 
   // read the parameters from relative nodel handle
-  nh.getParam("openpose_model_dir", openposeModelDir);
+  nh.getParam("frame_id", frameId);
+  nh.getParam("pub_topic", pubTopic);
+  nh.param("no_depth", noDepth, false); // default value is false
   nh.getParam("color_topic", colorTopic);
   nh.getParam("depth_topic", depthTopic);
   nh.getParam("cam_info_topic", camInfoTopic);
-  nh.getParam("frame_id", frameId);
-  nh.getParam("pub_topic", pubTopic);
+  nh.getParam("openpose_model_dir", openposeModelDir);
 
   if (openposeModelDir.empty())
   {
-    ROS_FATAL("Missing 'openpose_model_dir' info in launch file");
+    ROS_FATAL("Missing 'openpose_model_dir' info in launch file. Please make sure that you have executed 'run.launch' file.");
     exit(-1);
   }
 
@@ -439,7 +448,7 @@ int main(int argc, char* argv[])
   {
     ROS_INFO("Starting ros_openpose...");
     op::Wrapper opWrapper;
-    configureOpenPose(opWrapper, cameraReader, framePublisher, frameId);
+    configureOpenPose(opWrapper, cameraReader, framePublisher, frameId, noDepth);
 
     // start and run
     opWrapper.start();
