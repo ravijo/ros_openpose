@@ -2,7 +2,7 @@
 
 ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
-- [x] Intel Realsense Camera :heavy_check_mark:
+- [x] Intel RealSense Camera :heavy_check_mark:
 - [x] Microsoft Kinect v2 Camera :heavy_check_mark:
 - [x] Any color camera such as webcam etc :heavy_check_mark:
 
@@ -16,9 +16,9 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 
 ## Dependencies
-1. [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
 
-_Additionally camera specific ROS drivers such as [realsense-ros](https://github.com/IntelRealSense/realsense-ros), [iai_kinect2](https://github.com/code-iai/iai_kinect2) etc are required as per your camera model._
+_Note: Additionally camera specific ROS drivers such as [realsense-ros](https://github.com/IntelRealSense/realsense-ros), [iai_kinect2](https://github.com/code-iai/iai_kinect2) etc are required as per your camera model._
 
 
 ## Compilation
@@ -40,37 +40,47 @@ _Additionally camera specific ROS drivers such as [realsense-ros](https://github
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
 
 
-## Steps to run
+## Information
+The main launch file is `run.launch`. It has the following two important arguments-
+1. `openpose_args`: It is provided to support the standard OpenPose command-line arguments. Please edit the [run.launch](https://github.com/ravijo/ros_openpose/blob/d5d8e05978a1b085d8d6ffdc7604dc99a664d8d8/launch/run.launch#L30) file as shown below-
+    ```
+    <arg name="openpose_args" value="--face --hand"/>
+    ```
+1. `camera`: It can only be one of the following: `realsense`, `kinect`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
+
+
+## Steps to Run with Intel RealSense Camera
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```
-   source devel/setup.bash
+    source devel/setup.bash
     ```
-1. Invoke the single launch file by executing the following command-
+1. Invoke the main launch file by executing the following command-
     ```
-   roslaunch ros_openpose run.launch
+    roslaunch ros_openpose run.launch
     ```
 
-The standard openpose command-line arguments are also supported. To do so, please set the value of `openpose_args` by editing the [run.launch](https://github.com/ravijo/ros_openpose/blob/98e928c883474eace8c71f588b74bf25666ee9ca/launch/run.launch#L30) file as shown below-
 
-```
-<arg name="openpose_args" value="--face --hand"/>
-```
+## Steps to Run with Microsoft Kinect v2 Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```
+    roslaunch ros_openpose run.launch camera:=kinect
+    ```
 
-## Run with Intel Realsense Camera
-```
-roslaunch ros_openpose run.launch camera:=realsense
-```
 
-## Run with Microsoft Kinect v2 Camera
-```
-roslaunch ros_openpose run.launch camera:=kinect
-```
-
-## Run with Any color Camera such as Webcam etc
-```
-roslaunch ros_openpose run.launch camera:=nodepth
-```
-
+## Steps to Run with any Color Camera such as Webcam etc.
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```
+    source devel/setup.bash
+    ```
+1. Start the ROS package of your camera. Basically, this package is going to capture images from your camera, and then it is going to publish those images on a ROS topic. Make sure to set the correct ROS topic to `color_topic` inside [config_nodepth.launch](https://github.com/ravijo/ros_openpose/blob/d5d8e05978a1b085d8d6ffdc7604dc99a664d8d8/launch/config_nodepth.launch#L10) file.
+1. Invoke the main launch file by executing the following command-
+    ```
+    roslaunch ros_openpose run.launch camera:=nodepth
+    ```
 
 
 ## Note
