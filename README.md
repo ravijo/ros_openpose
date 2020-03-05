@@ -21,9 +21,14 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 _Note: Additionally camera specific ROS drivers such as [realsense-ros](https://github.com/IntelRealSense/realsense-ros), [iai_kinect2](https://github.com/code-iai/iai_kinect2) etc are required as per your camera model._
 
 
-## Compilation
+## Installation
 1. Make sure to download the complete repository. Use `git clone https://github.com/ravijo/ros_openpose.git` or download zip as per your convenience.
 1. Invoke catkin tool inside ros workspace i.e., `catkin_make`
+1. Make python scripts executable by using command below-
+```
+roscd ros_openpose/scripts
+chmod +x *.py
+```
 
 
 ## Troubleshooting
