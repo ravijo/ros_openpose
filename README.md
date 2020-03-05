@@ -45,12 +45,13 @@ chmod +x *.py
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
 
 
-## Information
-The main launch file is `run.launch`. It has the following two important arguments-
+## Configuration
+The main launch file is `run.launch`. It has the following important arguments-
 1. `openpose_args`: It is provided to support the standard OpenPose command-line arguments. Please edit the [run.launch](https://github.com/ravijo/ros_openpose/blob/d5d8e05978a1b085d8d6ffdc7604dc99a664d8d8/launch/run.launch#L30) file as shown below-
     ```
     <arg name="openpose_args" value="--face --hand"/>
     ```
+1. `openpose_model_dir` or `model_folder`: It represents the full path to the model directory of OpenPose. Kindly modify it as per OpenPose installation in your machine.
 1. `camera`: It can only be one of the following: `realsense`, `kinect`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
@@ -86,6 +87,13 @@ The main launch file is `run.launch`. It has the following two important argumen
     ```
     roslaunch ros_openpose run.launch camera:=nodepth
     ```
+
+Note: To confirm that ROS package of your camera is working properly, please check if the ROS package is publishing images by executing the following command-
+```
+rosrun image_view image_view image:=YOUR_ROSTOPIC
+```
+Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
+
 
 
 ## Note
