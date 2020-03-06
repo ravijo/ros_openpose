@@ -32,7 +32,6 @@ Date: 2019/11/23
   <arg name="openpose_args" default="" />
   <arg name="id_text_offset" default="" />
   <arg name="skeleton_hands" default="" />
-  <arg name="openpose_model_dir" default="" />
   <arg name="skeleton_line_width" default="" />
 
   <include file="$(find ros_openpose)/launch/core.launch" >
@@ -48,7 +47,6 @@ Date: 2019/11/23
     <arg name="id_text_offset" value="$(arg id_text_offset)" />
     <arg name="skeleton_hands" value="$(arg skeleton_hands)" />
     <arg name="cam_info_topic" value="$(arg cam_info_topic)" />
-    <arg name="openpose_model_dir" value="$(arg openpose_model_dir)" />
     <arg name="skeleton_line_width" value="$(arg skeleton_line_width)" />
   </include>
 

@@ -21,16 +21,14 @@ Date: 2019/11/23
   <arg name="skeleton_hands" default="false" />
 
   <!--
-  the standard openpose command-line arguments are also supported.
-  to do so, please change the value as shown below.
+   the standard openpose command-line arguments are also supported.
+   to do so, please change the value, as shown in the example below.
   -->
   <?ignore
     <arg name="openpose_args" value="--hand --disable_multi_thread --model_folder /home/ravi/openpose/models/" />
   ?>
-  <arg name="openpose_args" value="" />
-
   <!-- full path to the model dir of openpose -->
-  <arg name="openpose_model_dir" default="/home/ravi/tools/openpose/models/" />
+  <arg name="openpose_args" value="--model_folder /home/ravi/tools/openpose/models/" />
 
   <!-- rostopic to publish the 3D skeleton data -->
   <arg name="pub_topic" default="/frame" />
@@ -57,7 +55,6 @@ Date: 2019/11/23
     <arg name="openpose_args" value="$(arg openpose_args)" />
     <arg name="skeleton_hands" value="$(arg skeleton_hands)" />
     <arg name="id_text_offset" value="$(arg id_text_offset)" />
-    <arg name="openpose_model_dir" value="$(arg openpose_model_dir)" />
     <arg name="skeleton_line_width" value="$(arg skeleton_line_width)" />
   </include>
 </launch>

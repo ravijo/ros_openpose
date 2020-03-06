@@ -19,7 +19,6 @@ Date: 2020/03/02
   <arg name="cam_info_topic" default="" />
   <arg name="id_text_offset" default="" />
   <arg name="skeleton_hands" default="" />
-  <arg name="openpose_model_dir" default="" />
   <arg name="skeleton_line_width" default="" />
 
   <!-- invoke rosOpenpose node -->
@@ -30,7 +29,6 @@ Date: 2020/03/02
     <param name="color_topic" value="$(arg color_topic)" />
     <param name="depth_topic" value="$(arg depth_topic)" />
     <param name="cam_info_topic" value="$(arg cam_info_topic)" />
-    <param name="openpose_model_dir" value="$(arg openpose_model_dir)" />
   </node>
 
   <!-- invoke visualizer node -->
