@@ -47,11 +47,14 @@ chmod +x *.py
 
 ## Configuration
 The main launch file is `run.launch`. It has the following important arguments-
-1. `openpose_args`: It is provided to support the standard OpenPose command-line arguments. Please edit the [run.launch](https://github.com/ravijo/ros_openpose/blob/d5d8e05978a1b085d8d6ffdc7604dc99a664d8d8/launch/run.launch#L30) file as shown below-
+1. `model_folder`: It represents the full path to the model directory of OpenPose. Kindly modify it as per OpenPose installation in your machine. Please edit `run.launch` file as shown below-
+    ```
+    <arg name="openpose_args" --model_folder /home/ravi/openpose/models/"/>
+    ```
+1. `openpose_args`: It is provided to support the standard OpenPose command-line arguments. Please edit `run.launch` file as shown below-
     ```
     <arg name="openpose_args" value="--face --hand"/>
     ```
-1. `openpose_model_dir` or `model_folder`: It represents the full path to the model directory of OpenPose. Kindly modify it as per OpenPose installation in your machine.
 1. `camera`: It can only be one of the following: `realsense`, `kinect`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
