@@ -39,12 +39,8 @@ namespace ros_openpose
 
     // camera calibration parameters
     std::shared_ptr<sensor_msgs::CameraInfo> mSPtrCameraInfo;
-    // std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrColorImageSub;
-    // std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> mSPtrDepthImageSub;
-    // std::shared_ptr<message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image>> mSPtrSyncSubscriber;
 
     inline void subscribe();
-    // void imageCallback(const sensor_msgs::ImageConstPtr& colorMsg, const sensor_msgs::ImageConstPtr& depthMsg);
     void camInfoCallback(const sensor_msgs::CameraInfoConstPtr& camMsg);
     void colorImgCallback(const sensor_msgs::ImageConstPtr& colorMsg);
     void depthImgCallback(const sensor_msgs::ImageConstPtr& depthMsg);
@@ -77,18 +73,6 @@ namespace ros_openpose
       return mColorImageUsed;
     }
 
-    // returns the latest color frame from camera
-    // it locks the color and depth frame from camera. remember that we
-    // are just passing the pointer instead of copying whole data
-    const cv::Mat& getColorFrameAndStoreDepthFrame()
-    {
-      mMutex.lock();
-      mColorImageUsed = mColorImage;
-      mDepthImageUsed = mDepthImage;
-      mMutex.unlock();
-      return mColorImageUsed;
-    }
-
     // returns the latest depth frame from camera
     // it locks the depth frame. remember that we
     // are just passing the pointer instead of copying whole data
@@ -100,9 +84,9 @@ namespace ros_openpose
       return mDepthImageUsed;
     }
 
-    // copy the latest depth frame from camera. remember that we
+    // lock the latest depth frame from camera. remember that we
     // are just passing the pointer instead of copying whole data
-    void copyLatestDepthImage()
+    void lockLatestDepthImage()
     {
       mMutex.lock();
       mDepthImageUsed = mDepthImage;

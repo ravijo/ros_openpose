@@ -48,7 +48,6 @@ public:
       std::this_thread::sleep_for(std::chrono::milliseconds{1});
 
       // get the latest color image from the camera
-      // auto& colorImage = mSPtrCameraReader->getColorFrameAndStoreDepthFrame();
       auto& colorImage = mSPtrCameraReader->getColorFrame();
 
       if (!colorImage.empty())
@@ -111,7 +110,6 @@ public:
     {
       // src:
       // https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/output.md#keypoint-format-in-the-c-api
-
       const auto baseIndex = poseKeypoints.getSize(2) * (person * bodyPartCount + bodyPart);
       const auto x = poseKeypoints[baseIndex];
       const auto y = poseKeypoints[baseIndex + 1];
@@ -188,7 +186,7 @@ public:
         mFrame.persons.clear();
 
         // we use the latest depth image for computing point in 3D space
-        mSPtrCameraReader->copyLatestDepthImage();
+        mSPtrCameraReader->lockLatestDepthImage();
 
         // accesing each element of the keypoints
         const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
@@ -429,7 +427,7 @@ int main(int argc, char* argv[])
 
   if (pubTopic.empty())
   {
-    ROS_FATAL("Missing 'pubTopic' info in launch file. Please make sure that you have executed 'run.launch' file.");
+    ROS_FATAL("Missing 'pub_topic' info in launch file. Please make sure that you have executed 'run.launch' file.");
     exit(-1);
   }
 
