@@ -48,7 +48,8 @@ public:
       std::this_thread::sleep_for(std::chrono::milliseconds{1});
 
       // get the latest color image from the camera
-      auto& colorImage = mSPtrCameraReader->getColorFrameAndStoreDepthFrame();
+      // auto& colorImage = mSPtrCameraReader->getColorFrameAndStoreDepthFrame();
+      auto& colorImage = mSPtrCameraReader->getColorFrame();
 
       if (!colorImage.empty())
       {
@@ -187,7 +188,7 @@ public:
         mFrame.persons.clear();
 
         // we use the latest depth image for computing point in 3D space
-        // mSPtrCameraReader->copyLatestDepthImage();
+        mSPtrCameraReader->copyLatestDepthImage();
 
         // accesing each element of the keypoints
         const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
@@ -416,7 +417,7 @@ int main(int argc, char* argv[])
 
   // define the parameters, we are going to read
   bool noDepth;
-  std::string openposeModelDir, colorTopic, depthTopic, camInfoTopic, frameId, pubTopic;
+  std::string colorTopic, depthTopic, camInfoTopic, frameId, pubTopic;
 
   // read the parameters from relative nodel handle
   nh.getParam("frame_id", frameId);
@@ -425,16 +426,12 @@ int main(int argc, char* argv[])
   nh.getParam("color_topic", colorTopic);
   nh.getParam("depth_topic", depthTopic);
   nh.getParam("cam_info_topic", camInfoTopic);
-  nh.getParam("openpose_model_dir", openposeModelDir);
 
-  if (openposeModelDir.empty())
+  if (pubTopic.empty())
   {
-    ROS_FATAL("Missing 'openpose_model_dir' info in launch file. Please make sure that you have executed 'run.launch' file.");
+    ROS_FATAL("Missing 'pubTopic' info in launch file. Please make sure that you have executed 'run.launch' file.");
     exit(-1);
   }
-
-  // path of the dir where openpose models are located
-  FLAGS_model_folder = openposeModelDir;
 
   // parsing command line flags
   gflags::ParseCommandLineFlags(&argc, &argv, true);
