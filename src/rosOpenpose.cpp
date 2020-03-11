@@ -22,6 +22,9 @@
 #include <openpose/flags.hpp>
 #include <openpose/headers.hpp>
 
+// define sleep for input and output worker in milliseconds
+const int SLEEP_MS = 10;
+
 // define a few datatype
 typedef std::shared_ptr<op::Datum> sPtrDatum;
 typedef std::shared_ptr<std::vector<sPtrDatum>> sPtrVecSPtrDatum;
@@ -43,30 +46,40 @@ public:
   {
     try
     {
-      // just to lower the CPU usage
-      // todo: need to think of a better way instead
-      std::this_thread::sleep_for(std::chrono::milliseconds{1});
-
-      // get the latest color image from the camera
-      auto& colorImage = mSPtrCameraReader->getColorFrame();
-
-      if (!colorImage.empty())
+      auto frameNumber = mSPtrCameraReader->getFrameNumber();
+      if (frameNumber == 0 || frameNumber == mFrameNumber)
       {
-        // create new datum
-        auto datumsPtr = std::make_shared<std::vector<sPtrDatum>>();
-        datumsPtr->emplace_back();
-        auto& datumPtr = datumsPtr->at(0);
-        datumPtr = std::make_shared<op::Datum>();
-
-        // fill the datum
-        datumPtr->cvInputData = colorImage;
-        return datumsPtr;
+        // display the error at most once per 10 seconds
+        ROS_WARN_THROTTLE(10, "Waiting for color image frame...");
+        std::this_thread::sleep_for(std::chrono::milliseconds{SLEEP_MS});
+        return nullptr;
       }
       else
       {
-        // display the error at most once per 10 seconds
-        ROS_WARN_THROTTLE(10, "Empty color image frame detected. Ignoring...");
-        return nullptr;
+        // update frame number
+        mFrameNumber = frameNumber;
+
+        // get the latest color image from the camera
+        auto& colorImage = mSPtrCameraReader->getColorFrame();
+
+        if (!colorImage.empty())
+        {
+          // create new datum
+          auto datumsPtr = std::make_shared<std::vector<sPtrDatum>>();
+          datumsPtr->emplace_back();
+          auto& datumPtr = datumsPtr->at(0);
+          datumPtr = std::make_shared<op::Datum>();
+
+          // fill the datum
+          datumPtr->cvInputData = colorImage;
+          return datumsPtr;
+        }
+        else
+        {
+          // display the error at most once per 10 seconds
+          ROS_WARN_THROTTLE(10, "Empty color image frame detected. Ignoring...");
+          return nullptr;
+        }
       }
     }
     catch (const std::exception& e)
@@ -79,6 +92,7 @@ public:
   }
 
 private:
+  ullong mFrameNumber = 0ULL;
   const std::shared_ptr<ros_openpose::CameraReader> mSPtrCameraReader;
 };
 
@@ -211,6 +225,12 @@ public:
         }
 
         mFramePublisher.publish(mFrame);
+      }
+      else
+      {
+        // display the error at most once per 10 seconds
+        ROS_WARN_THROTTLE(10, "Waiting for datum...");
+        std::this_thread::sleep_for(std::chrono::milliseconds{SLEEP_MS});
       }
     }
     catch (const std::exception& e)
