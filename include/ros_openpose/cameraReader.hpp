@@ -23,6 +23,9 @@
 #include <mutex>
 #include <vector>
 
+// define a few datatype
+typedef unsigned long long ullong;
+
 namespace ros_openpose
 {
   class CameraReader
@@ -31,11 +34,13 @@ namespace ros_openpose
     cv::Mat mColorImage, mDepthImage;
     cv::Mat mColorImageUsed, mDepthImageUsed;
     std::string mColorTopic, mDepthTopic, mCamInfoTopic;
+    std::mutex mMutex;
     ros::NodeHandle mNh;
     ros::Subscriber mCamInfoSubscriber;
     ros::Subscriber mColorImgSubscriber;
     ros::Subscriber mDepthImgSubscriber;
-    std::mutex mMutex;
+
+    ullong mFrameNumber = 0ULL;
 
     // camera calibration parameters
     std::shared_ptr<sensor_msgs::CameraInfo> mSPtrCameraInfo;
@@ -61,6 +66,15 @@ namespace ros_openpose
 
     // we are okay with default destructor
     ~CameraReader() = default;
+
+
+    // returns the current frame number
+    // the frame number starts from 0 and increments
+    // by 1 each time a frame (color) is received
+    ullong getFrameNumber()
+    {
+      return mFrameNumber;
+    }
 
     // returns the latest color frame from camera
     // it locks the color frame. remember that we
