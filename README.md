@@ -49,7 +49,7 @@ chmod +x *.py
 The main launch file is `run.launch`. It has the following important arguments-
 1. `model_folder`: It represents the full path to the model directory of OpenPose. Kindly modify it as per OpenPose installation in your machine. Please edit `run.launch` file as shown below-
     ```
-    <arg name="openpose_args" --model_folder /home/ravi/openpose/models/"/>
+    <arg name="openpose_args" value="--model_folder /home/ravi/openpose/models/"/>
     ```
 1. `openpose_args`: It is provided to support the standard OpenPose command-line arguments. Please edit `run.launch` file as shown below-
     ```
