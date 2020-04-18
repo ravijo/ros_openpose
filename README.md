@@ -98,6 +98,17 @@ rosrun image_view image_view image:=YOUR_ROSTOPIC
 Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 
+## FAQ
+1. **How to add my own depth camera into this wrapper?**
+
+    Go inside `launch` subdirectory and make a copy of `config_realsense.launch` as `config_mycamera.launch`. Make necessary changes to the `color_topic`, `depth_topic`, `cam_info_topic` and `frame_id` arguments. More inforation is given below-
+    * Input depth images are aligned to the color images already. 
+    * Depth and color images have the same dimension. Therefore, each pixel from the color image can be mapped to corresponding depth pixel at the same x, y location. 
+    * The depth images contain depth values in millimeters and represented by `TYPE_16UC1` using OpenCV.
+    * The `cam_info_topic` is containing camera calibration parameters supplied by the manufacturer.
+
+    Please check [here](https://github.com/ravijo/ros_openpose/issues/9) for a smilar question.
+
 
 ## Note
 This package has been tested on the following environment configuration-
