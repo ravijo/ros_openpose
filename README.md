@@ -109,6 +109,17 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
     Please check [here](https://github.com/ravijo/ros_openpose/issues/9) for a smilar question.
 
+2. **How to run this wrapper with limited resources such as low GPU, RAM, etc.?**
+
+    Below is a brief explanation about the `ros_openpose` package. This package does not use GPU directly. However, it depends on `OpenPose`, which uses GPU heavily. It contains a few ROS subscribers, which copies data from the camera using ROS. Next, it employs two workers, namely input and output workers. The job of the input worker is to provide color images to the `OpenPose`, whereas the role of the output worker is to receive the keypoints detected in 2D (pixel) space. The output worker then converts 2D pixels to 3D coordinates. The input worker waits for 10 milliseconds if the camera provides no new frames, and then it checks again if no new frame is available. If not, then wait for 10 milliseconds, and the cycle continues. In this way, we make sure that the CPU gets some time to sleep (indirectly lowering the CPU usage). 
+
+    * If the CPU usage are high, try increasing the sleep value (`SLEEP_MS`) as defined [here](https://github.com/ravijo/ros_openpose/blob/d101e2550ded3bd8d6dd71e27ff43693f28894ab/src/rosOpenpose.cpp#L26). 
+    * Try reducing the `--net_resolution` and by using `--model_pose COCO`. 
+    * Try disabling multithreading in OpenPose software simply by supplying `--disable_multi_thread` to `openpose_args` inside `run.launch` file.
+    * Another easiest way is to decrease the FPS of your camera. Please try to lower it down as per your limitations.
+    
+    Please check [here](https://github.com/ravijo/ros_openpose/issues/6) for a similar question.
+
 
 ## Note
 This package has been tested on the following environment configuration-
