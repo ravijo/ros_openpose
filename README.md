@@ -107,7 +107,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
     * The depth images contain depth values in millimeters and represented by `TYPE_16UC1` using OpenCV.
     * The `cam_info_topic` is containing camera calibration parameters supplied by the manufacturer.
 
-    Please check [here](https://github.com/ravijo/ros_openpose/issues/9) for a smilar question.
+    Please check [here](https://github.com/ravijo/ros_openpose/issues/9) for a similar question.
 
 2. **How to run this wrapper with limited resources such as low GPU, RAM, etc.?**
 
