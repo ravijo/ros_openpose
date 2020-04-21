@@ -5,7 +5,7 @@ Author: Ravi Joshi
 Date: 2019/11/23
 -->
 <launch>
-  <!-- the value of this argument can only be one of the following: realsense, kinect, nodepth -->
+  <!-- the value of this argument can only be one of the following: realsense, kinect, zed2, nodepth -->
   <arg name="camera" default="realsense" />
 
   <!-- set this flag to see invoke RViz -->
