@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+
+<!--
+File: config_zed2.launch
+
+Author: Ravi Joshi (modified by Marike Koch van den Broek)
+Note: Do not run this file directly. Please call run.launch file instead.
+Date: 2020/04/16
+-->
+
+
+<launch>
+  <!-- zed2 camera_name - change if a different camera_name is wanted-->
+  <!--arg name="zed2_camera_name" default="zed2" / -->
+
+  <!-- rostopic to subscribe for color images -->
+  <arg name="color_topic" default="/zed2/zed_node/rgb/image_rect_color" />
+
+  <!-- rostopic to subscribe for depth images -->
+  <arg name="depth_topic" default="/zed2/zed_node/depth/depth_raw_registered" />
+
+  <!-- rostopic to subscribe for camera calibration parameters -->
+  <arg name="cam_info_topic" default="/zed2/zed_node/rgb/camera_info" />
+
+  <!-- frame id for point cloud and 3D skeleton data -->
+  <arg name="frame_id" default="zed2_left_camera_optical_frame" />
+
+  <!-- zed camera provide depth information.
+  hence unset the flag. -->
+  <arg name="no_depth" default="false" />
+
+  <!-- Note that the following parameters are going to assigned by other launch file upon call. -->
+  <arg name="rviz" default="" />
+  <arg name="print" default="" />
+  <arg name="skeleton" default="" />
+  <arg name="pub_topic" default="" />
+  <arg name="pointcloud" default="" />
+  <arg name="id_text_size" default="" />
+  <arg name="openpose_args" default="" />
+  <arg name="id_text_offset" default="" />
+  <arg name="skeleton_hands" default="" />
+  <arg name="skeleton_line_width" default="" />
+
+  <include file="$(find ros_openpose)/launch/core.launch" >
+    <arg name="print" value="$(arg print)" />
+    <arg name="no_depth" value="$(arg no_depth)" />
+    <arg name="skeleton" value="$(arg skeleton)" />
+    <arg name="frame_id" value="$(arg frame_id)" />
+    <arg name="pub_topic" value="$(arg pub_topic)" />
+    <arg name="color_topic" value="$(arg color_topic)" />
+    <arg name="depth_topic" value="$(arg depth_topic)" />
+    <arg name="id_text_size" value="$(arg id_text_size)" />
+    <arg name="openpose_args" value="$(arg openpose_args)" />
+    <arg name="id_text_offset" value="$(arg id_text_offset)" />
+    <arg name="skeleton_hands" value="$(arg skeleton_hands)" />
+    <arg name="cam_info_topic" value="$(arg cam_info_topic)" />
+    <arg name="skeleton_line_width" value="$(arg skeleton_line_width)" />
+  </include>
+
+  <!-- invoke zed camera ros package -->
+  <group if="$(arg pointcloud)" >
+    <include file="$(find zed_wrapper)/launch/zed2.launch" >
+      <!-- arg name="camera_name" value="$(arg zed2_camera_name)"/ -->
+    </include>
+    <!-- invoke rviz -->
+    <group if="$(arg rviz)" >
+      <node pkg="rviz" type="rviz" respawn="false" required="true" name="rviz" args="-d $(find ros_openpose)/files/person_pointcloud_zed2.rviz" />
+    </group>
+  </group>
+
+  <!-- invoke zed camera ros package -->
+  <group unless="$(arg pointcloud)" >
+    <include file="$(find zed_wrapper)/launch/zed2.launch" >
+      <!-- arg name="camera_name" value="$(arg zed2_camera_name)"/ -->
+    </include>
+    <!-- invoke rviz -->
+    <group if="$(arg rviz)" >
+      <node pkg="rviz" type="rviz" respawn="false" required="true" name="rviz" args="-d $(find ros_openpose)/files/only_person_zed2.rviz" />
+    </group>
+  </group>
+</launch>
