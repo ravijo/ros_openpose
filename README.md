@@ -141,3 +141,8 @@ This package has been tested on the following environment configuration-
 
 ## Issues (or Error Reporting)
 Please check [here](https://github.com/ravijo/ros_openpose/issues) and create issues accordingly.
+
+
+## Thanks
+Following authors are sincerely acknowledged for the improvements of this package-
+* [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
