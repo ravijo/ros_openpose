@@ -4,6 +4,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 - [x] Intel RealSense Camera :heavy_check_mark:
 - [x] Microsoft Kinect v2 Camera :heavy_check_mark:
+- [x] Stereolabs ZED2 Camera :heavy_check_mark: (see [thanks](#thanks) section)
 - [x] Any color camera such as webcam etc :heavy_check_mark:
 
 </br>
@@ -16,9 +17,12 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 
 ## Dependencies
-[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+* [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
 
-_Note: Additionally camera specific ROS drivers such as [realsense-ros](https://github.com/IntelRealSense/realsense-ros), [iai_kinect2](https://github.com/code-iai/iai_kinect2) etc are required as per your camera model._
+Note: Additionally, camera-specific ROS drivers such as following are required as per your camera model-
+* [realsense-ros](https://github.com/IntelRealSense/realsense-ros): For Intel RealSense Camera
+* [iai_kinect2](https://github.com/code-iai/iai_kinect2): For Microsoft Kinect v2 Camera
+* [zed-ros-wrapper](https://github.com/stereolabs/zed-ros-wrapper): For Stereolabs ZED2 Camera
 
 
 ## Installation
@@ -55,7 +59,7 @@ The main launch file is `run.launch`. It has the following important arguments-
     ```
     <arg name="openpose_args" value="--face --hand"/>
     ```
-1. `camera`: It can only be one of the following: `realsense`, `kinect`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
+1. `camera`: It can only be one of the following: `realsense`, `kinect`, `zed2`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
 ## Steps to Run with Intel RealSense Camera
@@ -77,6 +81,18 @@ The main launch file is `run.launch`. It has the following important arguments-
 1. Invoke the main launch file by executing the following command-
     ```
     roslaunch ros_openpose run.launch camera:=kinect
+    ```
+
+
+## Steps to Run with Stereolabs ZED2 Camera
+1. Change the parameter `openni_depth_mode` in the [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `0`).
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```
+    roslaunch ros_openpose run.launch camera:=zed2
     ```
 
 
