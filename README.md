@@ -19,6 +19,14 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
 
+  OpenPose version >= 1.6.0 are not supported (currently). OpenPose version 1.6.0 was released on Apr 26, 2020. In this version OpenPose has refactored the code to get rid of OpenCV in its headers. This version has introduced many new preprocessors. The preprocessor `OP_CV2OPCONSTMAT` is important for `ros_openpose`. I believe that if we change [this line](https://github.com/ravijo/ros_openpose/blob/e91fda9c8dd26800316bd7310995e45bc44e176a/src/rosOpenpose.cpp#L74) with the following code, we should be able to support OpenPose version >= 1.6.0-
+  ```
+  datumPtr->cvInputData = OP_CV2OPCONSTMAT(colorImage);
+  ```
+
+  _However, keep in mind that due to the COVID-19 pandemic, I cannot test the above workaround. I do not have access to my PC at the laboratory._
+
+
 Note: Additionally, camera-specific ROS drivers such as following are required as per your camera model-
 * [realsense-ros](https://github.com/IntelRealSense/realsense-ros): For Intel RealSense Camera
 * [iai_kinect2](https://github.com/code-iai/iai_kinect2): For Microsoft Kinect v2 Camera
