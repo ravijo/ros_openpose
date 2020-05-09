@@ -41,13 +41,17 @@ chmod +x *.py
 
 
 ## Troubleshooting
-1. While compiling the package, if the following error is reported at the terminal-
+1. While compiling the package, if any of the following error is reported at the terminal-
     ```
+    error: ‘check’ is not a member of ‘op’
+
     error: no match for ‘operator=’ (operand types are ‘op::Matrix’ and ‘const cv::Mat’)
+
+    error: invalid initialization of reference of type ‘const op::String&’ from expression of type ‘fLS::clstring {aka std::__cxx11::basic_string<char>}’
     ```
-    In this case, please update the OpenPose. Most likely, an old version of OpenPose is installed. So please checkout Openpose from the master branch as [described here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#update-openpose). Alternatively, you can checkout OpenPose version 1.5.1 by running the following command at the root directory of OpenPose installation-
+    In this case, please checkout OpenPose version 1.6.0 by running the following command at the root directory of OpenPose installation-
     ```
-    git checkout tags/v1.5.1
+    git checkout tags/v1.6.0
     ```
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
 1. If compliation fails by showing the following error-
@@ -59,8 +63,17 @@ chmod +x *.py
     find_package(Threads REQUIRED)
     ```
     For more information, please check [here](https://github.com/ravijo/ros_openpose/issues/12).
-
-
+1. <s>While compiling the package, if the following error is reported at the terminal-
+    ```
+    error: no match for ‘operator=’ (operand types are ‘op::Matrix’ and ‘const cv::Mat’)
+    ```
+    In this case, please update the OpenPose. Most likely, an old version of OpenPose is installed. So please checkout Openpose from the master branch as [described here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#update-openpose). Alternatively, you can checkout OpenPose version 1.5.1 by running the following command at the root directory of OpenPose installation-
+    ```
+    git checkout tags/v1.5.1
+    ```
+    Do not forget to run `sudo make install` to install the OpenPose system-wide.</s> *Note that OpenPose version 1.5.1 is still supported.*
+    
+    
 ## Configuration
 The main launch file is `run.launch`. It has the following important arguments-
 1. `model_folder`: It represents the full path to the model directory of OpenPose. Kindly modify it as per OpenPose installation in your machine. Please edit `run.launch` file as shown below-
