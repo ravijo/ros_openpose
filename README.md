@@ -148,7 +148,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
     
     Please check [here](https://github.com/ravijo/ros_openpose/issues/6) for a similar question.
 
-3. **How to find the OpenPose version of installed on my machiine?**
+3. **How to find the version of the OpenPose installed on my machiine?**
 
    Please use the shell script [get_openpose_version.sh](https://github.com/ravijo/ros_openpose/blob/master/get_openpose_version.sh) as shown below-
    ```
