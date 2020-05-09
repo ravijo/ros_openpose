@@ -29,6 +29,11 @@ if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+## Pass in the version of OpenPose
+add_definitions( -DOpenPose_VERSION_MAJOR=${OpenPose_VERSION_MAJOR} )
+add_definitions( -DOpenPose_VERSION_MINOR=${OpenPose_VERSION_MINOR} )
+add_definitions( -DOpenPose_VERSION_PATCH=${OpenPose_VERSION_PATCH} )
+
 ## Declare ROS messages
 add_message_files(
   FILES
