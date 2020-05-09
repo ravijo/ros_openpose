@@ -34,6 +34,7 @@ add_definitions( -DOpenPose_VERSION_MAJOR=${OpenPose_VERSION_MAJOR} )
 add_definitions( -DOpenPose_VERSION_MINOR=${OpenPose_VERSION_MINOR} )
 add_definitions( -DOpenPose_VERSION_PATCH=${OpenPose_VERSION_PATCH} )
 
+## Print OpenPose version in the terminal
 MESSAGE(STATUS "OpenPose VERSION: " ${OpenPose_VERSION})
 
 ## Declare ROS messages
