@@ -167,6 +167,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
    ```
    sh get_openpose_version.sh
    ```
+   You can use `cmake` as well. See [here]( https://github.com/ravijo/ros_openpose/blob/b4598b719e5699eb69f80d917a154e008e935c77/CMakeLists.txt#L37)
 
 
 ## Note
