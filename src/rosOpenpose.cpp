@@ -11,6 +11,9 @@
 
 // todo: merge the 'for' loop for body and hand keypoints into one
 
+// define a macro for compatibility with older versions
+#define OPENPOSE1POINT6_OR_HIGHER OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+
 // ROS headers
 #include <ros/ros.h>
 
@@ -71,7 +74,11 @@ public:
           datumPtr = std::make_shared<op::Datum>();
 
           // fill the datum
-          datumPtr->cvInputData = OP_CV2OPCONSTMAT(colorImage);;
+#if OPENPOSE1POINT6_OR_HIGHER
+          datumPtr->cvInputData = OP_CV2OPCONSTMAT(colorImage);
+#else
+          datumPtr->cvInputData = colorImage;
+#endif
           return datumsPtr;
         }
         else
@@ -132,11 +139,7 @@ public:
       float point3D[3];
       // compute 3D point only if depth flag is set
       if (!mNoDepth)
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
         mSPtrCameraReader->compute3DPoint(x, y, point3D);
-#else
-        datumPtr->cvInputData = colorImage;
-#endif
 
       mFrame.persons[person].bodyParts[bodyPart].pixel.x = x;
       mFrame.persons[person].bodyParts[bodyPart].pixel.y = y;
@@ -264,7 +267,7 @@ void configureOpenPose(op::Wrapper& opWrapper,
 
     // clang-format off
     // logging_level
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#if OPENPOSE1POINT6_OR_HIGHER
     op::checkBool(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255,
 #else
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255,
@@ -279,28 +282,28 @@ void configureOpenPose(op::Wrapper& opWrapper,
 
     // Applying user defined configuration - GFlags to program variables
     // outputSize
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#if OPENPOSE1POINT6_OR_HIGHER
     const auto outputSize = op::flagsToPoint(op::String(FLAGS_output_resolution), "-1x-1");
 #else
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
 #endif
 
     // netInputSize
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#if OPENPOSE1POINT6_OR_HIGHER
     const auto netInputSize = op::flagsToPoint(op::String(FLAGS_net_resolution), "-1x368");
 #else
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
 #endif
 
     // faceNetInputSize
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#if OPENPOSE1POINT6_OR_HIGHER
     const auto faceNetInputSize = op::flagsToPoint(op::String(FLAGS_face_net_resolution), "368x368 (multiples of 16)");
 #else
     const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
 #endif
 
     // handNetInputSize
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#if OPENPOSE1POINT6_OR_HIGHER
     const auto handNetInputSize = op::flagsToPoint(op::String(FLAGS_hand_net_resolution), "368x368 (multiples of 16)");
 #else
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
@@ -310,7 +313,7 @@ void configureOpenPose(op::Wrapper& opWrapper,
     const auto poseMode = op::flagsToPoseMode(FLAGS_body);
 
     // poseModel
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#if OPENPOSE1POINT6_OR_HIGHER
     const auto poseModel = op::flagsToPoseModel(op::String(FLAGS_model_pose));
 #else
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
@@ -353,7 +356,6 @@ void configureOpenPose(op::Wrapper& opWrapper,
     opWrapper.setWorker(op::WorkerType::Output, wUserOutput, workerOutputOnNewThread);
 
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
     const op::WrapperStructPose wrapperStructPose{poseMode,
                                                   netInputSize,
                                                   outputSize,
@@ -369,35 +371,11 @@ void configureOpenPose(op::Wrapper& opWrapper,
                                                   (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap,
                                                   FLAGS_part_to_show,
+#if OPENPOSE1POINT6_OR_HIGHER
                                                   op::String(FLAGS_model_folder),
-                                                  heatMapTypes,
-                                                  heatMapScaleMode,
-                                                  FLAGS_part_candidates,
-                                                  (float)FLAGS_render_threshold,
-                                                  FLAGS_number_people_max,
-                                                  FLAGS_maximize_positives,
-                                                  FLAGS_fps_max,
-                                                  op::String(FLAGS_prototxt_path),
-                                                  op::String(FLAGS_caffemodel_path),
-                                                  (float)FLAGS_upsampling_ratio,
-                                                  enableGoogleLogging};
 #else
-    const op::WrapperStructPose wrapperStructPose{poseMode,
-                                                  netInputSize,
-                                                  outputSize,
-                                                  keypointScaleMode,
-                                                  FLAGS_num_gpu,
-                                                  FLAGS_num_gpu_start,
-                                                  FLAGS_scale_number,
-                                                  (float)FLAGS_scale_gap,
-                                                  op::flagsToRenderMode(FLAGS_render_pose,
-                                                                        multipleView),
-                                                  poseModel,
-                                                  !FLAGS_disable_blending,
-                                                  (float)FLAGS_alpha_pose,
-                                                  (float)FLAGS_alpha_heatmap,
-                                                  FLAGS_part_to_show,
-                                                  op::String(FLAGS_model_folder),
+                                                  FLAGS_model_folder,
+#endif
                                                   heatMapTypes,
                                                   heatMapScaleMode,
                                                   FLAGS_part_candidates,
@@ -405,11 +383,15 @@ void configureOpenPose(op::Wrapper& opWrapper,
                                                   FLAGS_number_people_max,
                                                   FLAGS_maximize_positives,
                                                   FLAGS_fps_max,
+#if OPENPOSE1POINT6_OR_HIGHER
                                                   op::String(FLAGS_prototxt_path),
                                                   op::String(FLAGS_caffemodel_path),
+#else
+                                                  FLAGS_prototxt_path,
+                                                  FLAGS_caffemodel_path,
+#endif
                                                   (float)FLAGS_upsampling_ratio,
                                                   enableGoogleLogging};
-#endif
     opWrapper.configure(wrapperStructPose);
 
     // Face configuration (use op::WrapperStructFace{} to disable it)
@@ -447,19 +429,34 @@ void configureOpenPose(op::Wrapper& opWrapper,
     opWrapper.configure(wrapperStructExtra);
 
     // Output (comment or use default argument to disable any output)
-#if OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
     const op::WrapperStructOutput wrapperStructOutput{FLAGS_cli_verbose,
+#if OPENPOSE1POINT6_OR_HIGHER
                                                       op::String(FLAGS_write_keypoint),
+#else
+                                                      FLAGS_write_keypoint,
+#endif
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
+#if OPENPOSE1POINT6_OR_HIGHER
                                                       op::String(FLAGS_write_json),
                                                       op::String(FLAGS_write_coco_json),
+#else
+                                                      FLAGS_write_json,
+                                                      FLAGS_write_coco_json,
+#endif
                                                       FLAGS_write_coco_json_variants,
                                                       FLAGS_write_coco_json_variant,
+#if OPENPOSE1POINT6_OR_HIGHER
                                                       op::String(FLAGS_write_images),
                                                       op::String(FLAGS_write_images_format),
                                                       op::String(FLAGS_write_video),
+#else
+                                                      FLAGS_write_images,
+                                                      FLAGS_write_images_format,
+                                                      FLAGS_write_video,
+#endif
                                                       FLAGS_write_video_fps,
                                                       FLAGS_write_video_with_audio,
+#if OPENPOSE1POINT6_OR_HIGHER
                                                       op::String(FLAGS_write_heatmaps),
                                                       op::String(FLAGS_write_heatmaps_format),
                                                       op::String(FLAGS_write_video_3d),
@@ -468,18 +465,6 @@ void configureOpenPose(op::Wrapper& opWrapper,
                                                       op::String(FLAGS_udp_host),
                                                       op::String(FLAGS_udp_port)};
 #else
-    const op::WrapperStructOutput wrapperStructOutput{FLAGS_cli_verbose,
-                                                      FLAGS_write_keypoint,
-                                                      op::stringToDataFormat(FLAGS_write_keypoint_format),
-                                                      FLAGS_write_json,
-                                                      FLAGS_write_coco_json,
-                                                      FLAGS_write_coco_json_variants,
-                                                      FLAGS_write_coco_json_variant,
-                                                      FLAGS_write_images,
-                                                      FLAGS_write_images_format,
-                                                      FLAGS_write_video,
-                                                      FLAGS_write_video_fps,
-                                                      FLAGS_write_video_with_audio,
                                                       FLAGS_write_heatmaps,
                                                       FLAGS_write_heatmaps_format,
                                                       FLAGS_write_video_3d,
