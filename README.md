@@ -49,12 +49,19 @@ chmod +x *.py
     error: no match for ‘operator=’ (operand types are ‘op::Matrix’ and ‘const cv::Mat’)
     ```
     In this case, please update the OpenPose. Most likely, an old version of OpenPose is installed. So please checkout Openpose from the master branch as [described here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#update-openpose). Alternatively, you can checkout OpenPose version 1.5.1 by running the following command at the root directory of OpenPose installation-
-
-
-       git checkout tags/v1.5.1
-
-
+    ```
+    git checkout tags/v1.5.1
+    ```
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
+1. If compliation fails by showing the following error-
+    ```
+    /usr/bin/ld: cannot find -lThreads::Threads
+    ```
+    In this case, please put the following by editing the [CMakeLists.txt](https://github.com/ravijo/ros_openpose/blob/master/CMakeLists.txt)
+    ```
+    find_package(Threads REQUIRED)
+    ```
+    For more information, please check [here](https://github.com/ravijo/ros_openpose/issues/12).
 
 
 ## Configuration
