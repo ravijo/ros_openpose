@@ -19,6 +19,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 ## Supported OpenPose Versions
 * 1.6.0 *latest*  (see [thanks](#thanks) section)
 * 1.5.1
+* 1.5.0
 
 
 ## Dependencies
