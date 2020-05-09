@@ -16,16 +16,13 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 </p>
 
 
+## Supported OpenPose Versions
+* 1.6.0 *latest*  (see [thanks](#thanks) section)
+* 1.5.1
+
+
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
-
-  OpenPose version >= 1.6.0 are not supported (currently). OpenPose version 1.6.0 was released on Apr 26, 2020. In this version OpenPose has refactored the code to get rid of OpenCV in its headers. This version has introduced many new preprocessors. The preprocessor `OP_CV2OPCONSTMAT` is important for `ros_openpose`. I believe that if we change [this line](https://github.com/ravijo/ros_openpose/blob/e91fda9c8dd26800316bd7310995e45bc44e176a/src/rosOpenpose.cpp#L74) with the following code, we should be able to support OpenPose version >= 1.6.0-
-  ```
-  datumPtr->cvInputData = OP_CV2OPCONSTMAT(colorImage);
-  ```
-
-  _However, keep in mind that due to the COVID-19 pandemic, I cannot test the above workaround. I do not have access to my PC at the laboratory._
-
 
 Note: Additionally, camera-specific ROS drivers such as following are required as per your camera model-
 * [realsense-ros](https://github.com/IntelRealSense/realsense-ros): For Intel RealSense Camera
@@ -177,3 +174,5 @@ Please check [here](https://github.com/ravijo/ros_openpose/issues) and create is
 ## Thanks
 Following authors are sincerely acknowledged for the improvements of this package-
 * [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
+* [Zhi](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
+
