@@ -7,11 +7,11 @@
 #pragma once
 
 // ROS headers
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/image_encodings.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 
 // CV brigge header
 #include <cv_bridge/cv_bridge.h>
@@ -66,7 +66,6 @@ namespace ros_openpose
 
     // we are okay with default destructor
     ~CameraReader() = default;
-
 
     // returns the current frame number
     // the frame number starts from 0 and increments

@@ -11,19 +11,16 @@
 
 // todo: merge the 'for' loop for body and hand keypoints into one
 
-// define a macro for compatibility with older versions
-#define OPENPOSE1POINT6_OR_HIGHER OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
-
-// ROS headers
-#include <ros/ros.h>
-
-// ros_openpose headers
-#include <ros_openpose/Frame.h>
-#include <ros_openpose/cameraReader.hpp>
-
 // OpenPose headers
 #include <openpose/flags.hpp>
 #include <openpose/headers.hpp>
+
+// ros_openpose header
+#include <ros_openpose/Frame.h>
+#include <ros_openpose/cameraReader.hpp>
+
+// define a macro for compatibility with older versions
+#define OPENPOSE1POINT6_OR_HIGHER OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
 
 // define sleep for input and output worker in milliseconds
 const int SLEEP_MS = 10;
@@ -73,7 +70,7 @@ public:
           auto& datumPtr = datumsPtr->at(0);
           datumPtr = std::make_shared<op::Datum>();
 
-          // fill the datum
+// fill the datum
 #if OPENPOSE1POINT6_OR_HIGHER
           datumPtr->cvInputData = OP_CV2OPCONSTMAT(colorImage);
 #else
@@ -93,7 +90,8 @@ public:
     {
       this->stop();
       // display the error at most once per 10 seconds
-      ROS_ERROR_THROTTLE(10, "Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+      ROS_ERROR_THROTTLE(10, "Error %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__,
+                         __FILE__);
       return nullptr;
     }
   }
@@ -126,7 +124,7 @@ public:
   template <typename Array>
   void fillBodyROSMsg(Array& poseKeypoints, int person, int bodyPartCount)
   {
-    #pragma omp parallel for
+#pragma omp parallel for
     for (auto bodyPart = 0; bodyPart < bodyPartCount; bodyPart++)
     {
       // src:
@@ -153,7 +151,7 @@ public:
   template <typename ArrayOfArray>
   void fillHandROSMsg(ArrayOfArray& handKeypoints, int person, int handPartCount)
   {
-    #pragma omp parallel for
+#pragma omp parallel for
     for (auto handPart = 0; handPart < handPartCount; handPart++)
     {
       const auto baseIndex = handKeypoints[0].getSize(2) * (person * handPartCount + handPart);
@@ -263,9 +261,9 @@ void configureOpenPose(op::Wrapper& opWrapper,
 {
   try
   {
-    // Configuring OpenPose
+// Configuring OpenPose
 
-    // clang-format off
+// clang-format off
     // logging_level
 #if OPENPOSE1POINT6_OR_HIGHER
     op::checkBool(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255,
@@ -505,7 +503,7 @@ int main(int argc, char* argv[])
   // read the parameters from relative nodel handle
   nh.getParam("frame_id", frameId);
   nh.getParam("pub_topic", pubTopic);
-  nh.param("no_depth", noDepth, false); // default value is false
+  nh.param("no_depth", noDepth, false);  // default value is false
   nh.getParam("color_topic", colorTopic);
   nh.getParam("depth_topic", depthTopic);
   nh.getParam("cam_info_topic", camInfoTopic);

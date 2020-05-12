@@ -61,7 +61,8 @@ namespace ros_openpose
     catch (cv_bridge::Exception& e)
     {
       // display the error at most once per 10 seconds
-      ROS_ERROR_THROTTLE(10, "cv_bridge exception %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+      ROS_ERROR_THROTTLE(10, "cv_bridge exception %s at line number %d on function %s in file %s", e.what(), __LINE__,
+                         __FUNCTION__, __FILE__);
     }
   }
 
@@ -79,7 +80,8 @@ namespace ros_openpose
     catch (cv_bridge::Exception& e)
     {
       // display the error at most once per 10 seconds
-      ROS_ERROR_THROTTLE(10, "cv_bridge exception %s at line number %d on function %s in file %s", e.what(), __LINE__, __FUNCTION__, __FILE__);
+      ROS_ERROR_THROTTLE(10, "cv_bridge exception %s at line number %d on function %s in file %s", e.what(), __LINE__,
+                         __FUNCTION__, __FILE__);
     }
   }
 
