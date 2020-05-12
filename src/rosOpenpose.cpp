@@ -264,7 +264,7 @@ void configureOpenPose(op::Wrapper& opWrapper,
 // Configuring OpenPose
 
 // clang-format off
-    // logging_level
+// logging_level
 #if OPENPOSE1POINT6_OR_HIGHER
     op::checkBool(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255,
 #else
@@ -278,29 +278,29 @@ void configureOpenPose(op::Wrapper& opWrapper,
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     op::Profiler::setDefaultX(FLAGS_profile_speed);
 
-    // Applying user defined configuration - GFlags to program variables
-    // outputSize
+// Applying user defined configuration - GFlags to program variables
+// outputSize
 #if OPENPOSE1POINT6_OR_HIGHER
     const auto outputSize = op::flagsToPoint(op::String(FLAGS_output_resolution), "-1x-1");
 #else
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
 #endif
 
-    // netInputSize
+// netInputSize
 #if OPENPOSE1POINT6_OR_HIGHER
     const auto netInputSize = op::flagsToPoint(op::String(FLAGS_net_resolution), "-1x368");
 #else
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
 #endif
 
-    // faceNetInputSize
+// faceNetInputSize
 #if OPENPOSE1POINT6_OR_HIGHER
     const auto faceNetInputSize = op::flagsToPoint(op::String(FLAGS_face_net_resolution), "368x368 (multiples of 16)");
 #else
     const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
 #endif
 
-    // handNetInputSize
+// handNetInputSize
 #if OPENPOSE1POINT6_OR_HIGHER
     const auto handNetInputSize = op::flagsToPoint(op::String(FLAGS_hand_net_resolution), "368x368 (multiples of 16)");
 #else
@@ -310,7 +310,7 @@ void configureOpenPose(op::Wrapper& opWrapper,
     // poseMode
     const auto poseMode = op::flagsToPoseMode(FLAGS_body);
 
-    // poseModel
+// poseModel
 #if OPENPOSE1POINT6_OR_HIGHER
     const auto poseModel = op::flagsToPoseModel(op::String(FLAGS_model_pose));
 #else
