@@ -15,7 +15,7 @@
 #include <openpose/flags.hpp>
 #include <openpose/headers.hpp>
 
-// ros_openpose header
+// ros_openpose headers
 #include <ros_openpose/Frame.h>
 #include <ros_openpose/cameraReader.hpp>
 
