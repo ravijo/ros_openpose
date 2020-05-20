@@ -86,6 +86,11 @@ link_directories(
 add_executable(rosOpenpose
   src/rosOpenpose.cpp
   src/cameraReader.cpp)
+
+# Bug fix
+# src: https://github.com/ravijo/ros_openpose/issues/14#issuecomment-631164300
+add_dependencies(rosOpenpose ros_openpose_generate_messages_cpp)
+
 target_link_libraries(rosOpenpose
   ${OpenPose_LIBS}
   ${GFLAGS_LIBRARY}
@@ -97,6 +102,7 @@ target_link_libraries(rosOpenpose
 add_executable(testCameraReader
   src/testCameraReader.cpp
   src/cameraReader.cpp)
+
 target_link_libraries(testCameraReader
   ${OpenPose_LIBS}
   ${GFLAGS_LIBRARY}
