@@ -107,33 +107,40 @@ namespace ros_openpose
     }
 
     // compute the point in 3D space for a given pixel without considering distortion
-    void compute3DPoint(const float pixel_x, const float pixel_y, float (&point)[3])
+    void compute3DPoint(const float pixelX, const float pixelY, float (&point)[3])
     {
-      /*
-       * K.at(0) = intrinsic.fx
-       * K.at(4) = intrinsic.fy
-       * K.at(2) = intrinsic.ppx
-       * K.at(5) = intrinsic.ppy
-       */
+      // K.at(0) = intrinsic.fx
+      // K.at(4) = intrinsic.fy
+      // K.at(2) = intrinsic.ppx
+      // K.at(5) = intrinsic.ppy
 
       // our depth frame type is 16UC1 which has unsigned short as an underlying type
-      auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixel_y), static_cast<int>(pixel_x));
+      auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixelY), static_cast<int>(pixelX));
 
-      // no need to proceed further if the depth is zero
+      // no need to proceed further if the depth is zero or less than zero
       // the depth represents the distance of an object placed infront of the camera
-      // therefore depth must be always a positive number
+      // therefore depth must always be a positive number
       if (depth <= 0)
         return;
 
-      // convert to meter (SI units)
-      auto depthSI = depth * 0.001f;
+      // the following calculation can also be done by image_geometry
+      // for example:
+      // image_geometry::PinholeCameraModel camModel;
+      // camModel.fromCameraInfo(mSPtrCameraInfo);
+      // cv::Point2d depthPixel(pixelX, pixelY);
+      // auto point3d = camModel.projectPixelTo3dRay(depthPixel)
+      // auto depth = mDepthImageUsed.at<unsigned short>(depthPixel);
+      // point[0] = depth * point3d.x;
+      // point[1] = depth * point3d.y;
+      // point[2] = depth * point3d.z;
+      // for more info., please see http://wiki.ros.org/image_geometry
 
-      auto x = (pixel_x - mSPtrCameraInfo->K.at(2)) / mSPtrCameraInfo->K.at(0);
-      auto y = (pixel_y - mSPtrCameraInfo->K.at(5)) / mSPtrCameraInfo->K.at(4);
+      auto x = (pixelX - mSPtrCameraInfo->K.at(2)) / mSPtrCameraInfo->K.at(0);
+      auto y = (pixelY - mSPtrCameraInfo->K.at(5)) / mSPtrCameraInfo->K.at(4);
 
-      point[0] = depthSI * x;
-      point[1] = depthSI * y;
-      point[2] = depthSI;
+      point[0] = depth * x;
+      point[1] = depth * y;
+      point[2] = depth;
     }
   };
 }

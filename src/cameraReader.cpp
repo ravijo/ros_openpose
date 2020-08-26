@@ -52,6 +52,7 @@ namespace ros_openpose
     try
     {
       auto colorPtr = cv_bridge::toCvCopy(colorMsg, sensor_msgs::image_encodings::BGR8);
+
       // it is very important to lock the below assignment operation.
       // remember that we are accessing it from another thread too.
       std::lock_guard<std::mutex> lock(mMutex);
@@ -75,7 +76,15 @@ namespace ros_openpose
       // it is very important to lock the below assignment operation.
       // remember that we are accessing it from another thread too.
       std::lock_guard<std::mutex> lock(mMutex);
-      mDepthImage = depthPtr->image;
+
+      // i assumed that by using cv_bridge::toCvCopy(msg, image_encodings::TYPE_16UC1)
+      // function will change the encoding as well as convert the image format
+      // however I found that it is only changing encoding.
+      // therefore in case of '16UC1' encoding (depth values are in millimeter),
+      // a manually conversion from millimeter to meter is required.
+      mDepthImage = (depthMsg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) ?
+                        depthPtr->image * 0.001f : // convert to meter (SI units)
+                        depthPtr->image; // no conversion needed
     }
     catch (cv_bridge::Exception& e)
     {
