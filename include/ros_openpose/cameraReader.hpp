@@ -115,7 +115,8 @@ namespace ros_openpose
       // K.at(5) = intrinsic.ppy
 
       // our depth frame type is 16UC1 which has unsigned short as an underlying type
-      auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixelY), static_cast<int>(pixelX));
+      // auto depth = mDepthImageUsed.at<unsigned short>(static_cast<int>(pixelY), static_cast<int>(pixelX));
+      auto depth = mDepthImageUsed.at<float>(static_cast<int>(pixelY), static_cast<int>(pixelX));
 
       // no need to proceed further if the depth is zero or less than zero
       // the depth represents the distance of an object placed infront of the camera
