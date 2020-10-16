@@ -71,16 +71,13 @@ namespace ros_openpose
   {
     try
     {
-      auto depthPtr = cv_bridge::toCvCopy(depthMsg, sensor_msgs::image_encodings::TYPE_16UC1);
+      auto depthPtr = cv_bridge::toCvCopy(depthMsg, sensor_msgs::image_encodings::TYPE_32FC1);
 
       // it is very important to lock the below assignment operation.
       // remember that we are accessing it from another thread too.
       std::lock_guard<std::mutex> lock(mMutex);
 
-      // i assumed that by using cv_bridge::toCvCopy(msg, image_encodings::TYPE_16UC1)
-      // function will change the encoding as well as convert the image format
-      // however I found that it is only changing encoding.
-      // therefore in case of '16UC1' encoding (depth values are in millimeter),
+      // in case of '16UC1' encoding (depth values are in millimeter),
       // a manually conversion from millimeter to meter is required.
       if (depthMsg->encoding == sensor_msgs::image_encodings::TYPE_16UC1)
         depthPtr->image.convertTo(mDepthImage, CV_32FC1, 0.001f); // convert to meter (SI units)
