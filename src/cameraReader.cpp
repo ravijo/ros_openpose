@@ -80,7 +80,9 @@ namespace ros_openpose
       // in case of '16UC1' encoding (depth values are in millimeter),
       // a manually conversion from millimeter to meter is required.
       if (depthMsg->encoding == sensor_msgs::image_encodings::TYPE_16UC1)
-        depthPtr->image.convertTo(mDepthImage, CV_32FC1, 0.001f); // convert to meter (SI units)
+        // -1 represents no change in datatype
+        // src: https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#adf88c60c5b4980e05bb556080916978b
+        depthPtr->image.convertTo(mDepthImage, -1, 0.001f);
       else
         mDepthImage = depthPtr->image; // no conversion needed
     }
