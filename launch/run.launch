@@ -5,6 +5,13 @@ Author: Ravi Joshi
 Date: 2019/11/23
 -->
 <launch>
+
+  <!-- set this flag to switch ros_openpose to a synchronous setting -->
+  <arg name="synchronous" default="false" />
+
+  <!-- specify path of python openpose library (only necessary if synchronous setting is being used) -->
+  <arg name="py_openpose_path" default="/usr/local/python" />
+
   <!-- the value of this argument can only be one of the following: realsense, kinect, zed2, nodepth -->
   <arg name="camera" default="realsense" />
 
@@ -56,5 +63,7 @@ Date: 2019/11/23
     <arg name="skeleton_hands" value="$(arg skeleton_hands)" />
     <arg name="id_text_offset" value="$(arg id_text_offset)" />
     <arg name="skeleton_line_width" value="$(arg skeleton_line_width)" />
+    <arg name="synchronous" value="$(arg synchronous)" />
+    <arg name="py_openpose_path" value="$(arg py_openpose_path)" />
   </include>
 </launch>

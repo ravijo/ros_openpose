@@ -20,16 +20,32 @@ Date: 2020/03/02
   <arg name="id_text_offset" default="" />
   <arg name="skeleton_hands" default="" />
   <arg name="skeleton_line_width" default="" />
+  <arg name="synchronous" default="" />
+  <arg name="py_openpose_path" default="" />
 
-  <!-- invoke rosOpenpose node -->
-  <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenpose" output="screen" required="true" args="$(arg openpose_args)" >
-    <param name="frame_id" value="$(arg frame_id)" />
-    <param name="no_depth" value="$(arg no_depth)" />
-    <param name="pub_topic" value="$(arg pub_topic)" />
-    <param name="color_topic" value="$(arg color_topic)" />
-    <param name="depth_topic" value="$(arg depth_topic)" />
-    <param name="cam_info_topic" value="$(arg cam_info_topic)" />
-  </node>
+  <group if="$(arg synchronous)" >
+    <!-- invoke synchronous node -->
+    <node name="rosOpenpose" pkg="ros_openpose" type="ros_openpose_synchronous.py" output="screen" required="true" args="$(arg openpose_args)" >
+      <param name="frame_id" value="$(arg frame_id)" />
+      <param name="no_depth" value="$(arg no_depth)" />
+      <param name="pub_topic" value="$(arg pub_topic)" />
+      <param name="color_topic" value="$(arg color_topic)" />
+      <param name="depth_topic" value="$(arg depth_topic)" />
+      <param name="cam_info_topic" value="$(arg cam_info_topic)" />
+      <param name="py_openpose_path" value="$(arg py_openpose_path)" />
+    </node>
+  </group>
+  <group unless="$(arg synchronous)" >
+    <!-- invoke asynchronous node -->
+    <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenpose" output="screen" required="true" args="$(arg openpose_args)" >
+      <param name="frame_id" value="$(arg frame_id)" />
+      <param name="no_depth" value="$(arg no_depth)" />
+      <param name="pub_topic" value="$(arg pub_topic)" />
+      <param name="color_topic" value="$(arg color_topic)" />
+      <param name="depth_topic" value="$(arg depth_topic)" />
+      <param name="cam_info_topic" value="$(arg cam_info_topic)" />
+    </node>
+  </group>
 
   <!-- invoke visualizer node -->
   <group unless="$(arg no_depth)" >
