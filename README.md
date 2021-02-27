@@ -91,6 +91,21 @@ The main launch file is `run.launch`. It has the following important arguments-
 1. `camera`: It can only be one of the following: `realsense`, `kinect`, `zed2`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
+## Implementation Verisons Info.
+* **Synchronous API**  (see [thanks](#thanks) section)
+  * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
+  * Uses OpenPose Python bindings. Therefore, please compile OpenPose accordingly
+  * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
+    ```
+    roslaunch ros_openpose run.launch camera:=realsense synchronous:=true py_openpose_path:=absolute_path_to_py_openpose
+    ```
+* **Asynchronous API**
+  * Uses two workers, `op::WorkerProducer` and `op::WorkerConsumer` workers provided by OpenPose
+  * Uses OpenPose CPP APIs
+  * By default this version is enabled. Users are advised to try `synchronous:=true` if not satisfied with the performance.
+
+
+
 ## Steps to Run with Intel RealSense Camera
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```
@@ -211,4 +226,4 @@ Please check [here](https://github.com/ravijo/ros_openpose/issues) and create is
 Following authors are sincerely acknowledged for the improvements of this package-
 * [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
 * [Zhi](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
-
+* [QuantuMope](https://github.com/QuantuMope): For providing synchronous version i.e., `op_wrapper.emplaceAndPop()` support for OpenPose 1.6
