@@ -16,7 +16,7 @@ Date: 2019/10/08
   <arg name="cam_info_topic" default="/camera/color/camera_info" />
 
   <!-- frame id for point cloud and 3D skeleton data -->
-  <arg name="frame_id" default="camera_depth_optical_frame" />
+  <arg name="frame_id" default="camera_color_optical_frame" />
 
   <!-- realsense camera provide depth information.
   hence unset the flag. -->
@@ -33,6 +33,8 @@ Date: 2019/10/08
   <arg name="id_text_offset" default="" />
   <arg name="skeleton_hands" default="" />
   <arg name="skeleton_line_width" default="" />
+  <arg name="synchronous" default="" />
+  <arg name="py_openpose_path" default="" />
 
   <include file="$(find ros_openpose)/launch/core.launch" >
     <arg name="print" value="$(arg print)" />
@@ -48,6 +50,8 @@ Date: 2019/10/08
     <arg name="skeleton_hands" value="$(arg skeleton_hands)" />
     <arg name="cam_info_topic" value="$(arg cam_info_topic)" />
     <arg name="skeleton_line_width" value="$(arg skeleton_line_width)" />
+    <arg name="synchronous" value="$(arg synchronous)" />
+    <arg name="py_openpose_path" value="$(arg py_openpose_path)" />
   </include>
 
   <!-- invoke realsense camera ros package -->
