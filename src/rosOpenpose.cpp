@@ -21,6 +21,7 @@
 
 // define a macro for compatibility with older versions
 #define OPENPOSE1POINT6_OR_HIGHER OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 6
+#define OPENPOSE1POINT7POINT1_OR_HIGHER OpenPose_VERSION_MAJOR >= 1 && OpenPose_VERSION_MINOR >= 7 && OpenPose_VERSION_PATCH >=1
 
 // define sleep for input and output worker in milliseconds
 const int SLEEP_MS = 10;
@@ -356,7 +357,12 @@ void configureOpenPose(op::Wrapper& opWrapper,
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{poseMode,
                                                   netInputSize,
+#if OPENPOSE1POINT7POINT1_OR_HIGHER
+                                                  FLAGS_net_resolution_dynamic,
                                                   outputSize,
+#else
+                                                  outputSize,
+#endif
                                                   keypointScaleMode,
                                                   FLAGS_num_gpu,
                                                   FLAGS_num_gpu_start,
