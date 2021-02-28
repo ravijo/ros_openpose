@@ -18,7 +18,8 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
 
 ## Supported OpenPose Versions
-* 1.6.0 *latest*  (see [thanks](#thanks) section)
+* 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
+* 1.6.0 (see [thanks](#thanks) section)
 * 1.5.1
 * 1.5.0
 
@@ -45,6 +46,14 @@ chmod +x *.py
 
 
 ## Troubleshooting
+1. While compiling the package, if the following error is reported at the terminal-
+    ```
+    error: no matching function for call to ‘op::WrapperStructPose::WrapperStructPose(<brace-enclosed initializer list>)’
+    ```
+    In this case, please checkout OpenPose version 1.7.0 by running the following command at the root directory of OpenPose installation-
+    ```
+    git checkout tags/v1.7.0
+    ```
 1. While compiling the package, if any of the following error is reported at the terminal-
     ```
     error: ‘check’ is not a member of ‘op’
@@ -91,8 +100,10 @@ The main launch file is `run.launch`. It has the following important arguments-
 1. `camera`: It can only be one of the following: `realsense`, `kinect`, `zed2`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
-## Implementation Verisons Info.
+## Implementation Versions Info.
 * **Synchronous API**  (see [thanks](#thanks) section)
+  * *Tested with 1.6.0*
+    * Please report in case of any errors. In this situation please use OpenPose v1.6.0
   * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
   * Uses OpenPose Python bindings. Therefore, please compile OpenPose accordingly
   * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
@@ -191,7 +202,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
     
     Please check [here](https://github.com/ravijo/ros_openpose/issues/6) for a similar question.
 
-3. **How to find the version of the OpenPose installed on my machiine?**
+3. **How to find the version of the OpenPose installed on my machine?**
 
    Please use the shell script [get_openpose_version.sh](https://github.com/ravijo/ros_openpose/blob/master/get_openpose_version.sh) as shown below-
    ```
