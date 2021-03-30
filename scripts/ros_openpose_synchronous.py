@@ -24,6 +24,9 @@ except ImportError as e:
     raise e
 
 
+OPENPOSE1POINT7_OR_HIGHER = 'VectorDatum' in op.__dict__
+
+
 class rosOpenPose:
     def __init__(self, frame_id, no_depth, pub_topic, color_topic, depth_topic, cam_info_topic, op_wrapper, display):
         image_sub = message_filters.Subscriber(color_topic, Image)
@@ -101,7 +104,11 @@ class rosOpenPose:
         # Push data to OpenPose and block while waiting for results
         datum = op.Datum()
         datum.cvInputData = image
-        self.op_wrapper.emplaceAndPop([datum])
+
+        if OPENPOSE1POINT7_OR_HIGHER:
+            self.op_wrapper.emplaceAndPop(op.VectorDatum([datum]))
+        else:
+            self.op_wrapper.emplaceAndPop([datum])
 
         pose_kp = datum.poseKeypoints
         lhand_kp = datum.handKeypoints[0]
