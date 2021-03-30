@@ -6,6 +6,7 @@ import cv2
 import rospy
 import argparse
 import message_filters
+import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 from ros_openpose.msg import Frame, Person, BodyPart, Pixel
 from sensor_msgs.msg import Image, CameraInfo
@@ -22,6 +23,9 @@ except ImportError as e:
     rospy.logerr('OpenPose library could not be found. '
                  'Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
     raise e
+
+
+OPENPOSE1POINT7_OR_HIGHER = 'VectorDatum' in op.__dict__
 
 
 class rosOpenPose:
@@ -101,7 +105,11 @@ class rosOpenPose:
         # Push data to OpenPose and block while waiting for results
         datum = op.Datum()
         datum.cvInputData = image
-        self.op_wrapper.emplaceAndPop([datum])
+
+        if OPENPOSE1POINT7_OR_HIGHER:
+            self.op_wrapper.emplaceAndPop(op.VectorDatum([datum]))
+        else:
+            self.op_wrapper.emplaceAndPop([datum])
 
         pose_kp = datum.poseKeypoints
         lhand_kp = datum.handKeypoints[0]
