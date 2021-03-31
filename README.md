@@ -102,8 +102,6 @@ The main launch file is `run.launch`. It has the following important arguments-
 
 ## Implementation Versions Info.
 * **Synchronous API**  (see [thanks](#thanks) section)
-  * *Tested with 1.6.0*
-    * Please report in case of any errors. In this situation please use OpenPose v1.6.0
   * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
   * Uses OpenPose Python bindings. Therefore, please compile OpenPose accordingly
   * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
@@ -237,4 +235,6 @@ Please check [here](https://github.com/ravijo/ros_openpose/issues) and create is
 Following authors are sincerely acknowledged for the improvements of this package-
 * [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
 * [Zhi](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
-* [QuantuMope](https://github.com/QuantuMope): For providing synchronous version i.e., `op_wrapper.emplaceAndPop()` support for OpenPose 1.6
+* [Andrew Choi](https://github.com/QuantuMope): For providing synchronous version i.e., `op_wrapper.emplaceAndPop()` support for OpenPose 1.6
+* [Rui Luo](https://github.com/luorui93): For fixing a crash in ros_openpose_synchronous.py when nobody or only partial body is visible
+* 
