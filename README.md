@@ -237,4 +237,3 @@ Following authors are sincerely acknowledged for the improvements of this packag
 * [Zhi](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
 * [Andrew Choi](https://github.com/QuantuMope): For providing synchronous version i.e., `op_wrapper.emplaceAndPop()` support for OpenPose 1.6
 * [Rui Luo](https://github.com/luorui93): For fixing a crash in ros_openpose_synchronous.py when nobody or only partial body is visible
-* 
