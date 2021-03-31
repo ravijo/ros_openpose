@@ -115,23 +115,30 @@ class rosOpenPose:
         rhand_kp = datum.handKeypoints[1]
 
         # Set number of people detected
-        if pose_kp.shape == ():
-            num_persons = 0
-            body_part_count = 0
+        if pose_kp is not None:
+            if pose_kp.shape == ():
+                num_persons = 0
+                body_part_count = 0
+            else:
+                num_persons = pose_kp.shape[0]
+                body_part_count = pose_kp.shape[1]
         else:
-            num_persons = pose_kp.shape[0]
-            body_part_count = pose_kp.shape[1]
+            return
 
         # Check to see if hands were detected
         lhand_detected = False
         rhand_detected = False
         hand_part_count = 0
-        if lhand_kp.shape != ():
-            lhand_detected = True
-            hand_part_count = lhand_kp.shape[1]
-        if rhand_kp.shape != ():
-            rhand_detected = True
-            hand_part_count = rhand_kp.shape[1]
+
+        if lhand_kp is not None:
+            if lhand_kp.shape != ():
+                lhand_detected = True
+                hand_part_count = lhand_kp.shape[1]
+
+        if rhand_kp is not None:
+            if rhand_kp.shape != ():
+                rhand_detected = True
+                hand_part_count = rhand_kp.shape[1]
 
         # Handle body points
         fr.persons = [Person() for _ in range(num_persons)]
@@ -174,7 +181,7 @@ class rosOpenPose:
 
         except IndexError as e:
             rospy.logerr("Indexing error occured: {}".format(e))
-            return
+            # return
 
         if self.display: self.frame = datum.cvOutputData.copy()
         self.pub.publish(fr)
