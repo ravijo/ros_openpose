@@ -53,6 +53,14 @@ class rosOpenPose:
         self.cx = False
         self.cy = False
 
+        # Function wrappers for OpenPose version discrepancies
+        if OPENPOSE1POINT7_OR_HIGHER:
+            self.emplaceAndPop = lambda datum: self.op_wrapper.emplaceAndPop(op.VectorDatum([datum]))
+            self.detect = lambda kp: kp is not None
+        else:
+            self.emplaceAndPop = lambda datum: self.op_wrapper.emplaceAndPop([datum])
+            self.detect = lambda kp: kp.shape != ()
+
         """ OpenPose skeleton dictionary
         {0, "Nose"}, {13, "LKnee"}
         {1, "Neck"}, {14, "LAnkle"}
@@ -104,41 +112,32 @@ class rosOpenPose:
         # Push data to OpenPose and block while waiting for results
         datum = op.Datum()
         datum.cvInputData = image
-
-        if OPENPOSE1POINT7_OR_HIGHER:
-            self.op_wrapper.emplaceAndPop(op.VectorDatum([datum]))
-        else:
-            self.op_wrapper.emplaceAndPop([datum])
+        self.emplaceAndPop(datum)
 
         pose_kp = datum.poseKeypoints
         lhand_kp = datum.handKeypoints[0]
         rhand_kp = datum.handKeypoints[1]
 
         # Set number of people detected
-        if pose_kp is not None:
-            if pose_kp.shape == ():
-                num_persons = 0
-                body_part_count = 0
-            else:
-                num_persons = pose_kp.shape[0]
-                body_part_count = pose_kp.shape[1]
+        if self.detect(pose_kp):
+            num_persons = pose_kp.shape[0]
+            body_part_count = pose_kp.shape[1]
         else:
-            return
+            num_persons = 0
+            body_part_count = 0
 
         # Check to see if hands were detected
         lhand_detected = False
         rhand_detected = False
         hand_part_count = 0
 
-        if lhand_kp is not None:
-            if lhand_kp.shape != ():
-                lhand_detected = True
-                hand_part_count = lhand_kp.shape[1]
+        if self.detect(lhand_kp):
+            lhand_detected = True
+            hand_part_count = lhand_kp.shape[1]
 
-        if rhand_kp is not None:
-            if rhand_kp.shape != ():
-                rhand_detected = True
-                hand_part_count = rhand_kp.shape[1]
+        if self.detect(rhand_kp):
+            rhand_detected = True
+            hand_part_count = rhand_kp.shape[1]
 
         # Handle body points
         fr.persons = [Person() for _ in range(num_persons)]
@@ -180,7 +179,7 @@ class rosOpenPose:
                         arr.point.z = z
 
         except IndexError as e:
-            rospy.logerr("Indexing error occured: {}".format(e))
+            rospy.logerr("Indexing error occurred: {}".format(e))
             # return
 
         if self.display: self.frame = datum.cvOutputData.copy()
