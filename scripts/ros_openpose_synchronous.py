@@ -47,11 +47,11 @@ class rosOpenPose:
         self.frame = None
 
         # This subscriber is run only once to populate necessary K matrix values.
-        self.info_sub = rospy.Subscriber(cam_info_topic, CameraInfo, self.get_info_callback)
-        self.fx = False
-        self.fy = False
-        self.cx = False
-        self.cy = False
+        cam_info = rospy.wait_for_message(cam_info_topic, CameraInfo)
+        self.fx = cam_info.K[0]
+        self.fy = cam_info.K[2]
+        self.cx = cam_info.K[4]
+        self.cy = cam_info.K[5]
 
         # Function wrappers for OpenPose version discrepancies
         if OPENPOSE1POINT7_OR_HIGHER:
@@ -77,13 +77,6 @@ class rosOpenPose:
         {12, "LHip"}, {25, "Background"}
         """
 
-    def get_info_callback(self, cam_info):
-        self.fx = cam_info.K[0]
-        self.cx = cam_info.K[2]
-        self.fy = cam_info.K[4]
-        self.cy = cam_info.K[5]
-        self.info_sub.unregister()
-
     def convert_to_3d(self, u, v, depth):
         if self.no_depth: return 0, 0, 0
         z = depth[int(v), int(u)] / 1000
@@ -92,10 +85,6 @@ class rosOpenPose:
         return x, y, z
 
     def callback(self, ros_image, ros_depth):
-        # Don't process if we have not obtained K matrix yet
-        if not (self.fx and self.cx and self.fy and self.cy):
-            return
-
         # Construct a frame with current time !before! pushing to OpenPose
         fr = Frame()
         fr.header.frame_id = self.frame_id
