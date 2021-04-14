@@ -6,6 +6,7 @@ import cv2
 import rospy
 import argparse
 import message_filters
+import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 from ros_openpose.msg import Frame, Person, BodyPart, Pixel
 from sensor_msgs.msg import Image, CameraInfo
@@ -77,12 +78,26 @@ class rosOpenPose:
         {12, "LHip"}, {25, "Background"}
         """
 
-    def convert_to_3d(self, u, v, depth):
-        if self.no_depth: return 0, 0, 0
-        z = depth[int(v), int(u)] / 1000
-        x = (z / self.fx) * (u - self.cx)
-        y = (z / self.fy) * (v - self.cy)
-        return x, y, z
+    def compute_3D_vectorized(self, kp, depth):
+        # Create views (no copies made, so this remains efficient)
+        U = kp[:, :, 0]
+        V = kp[:, :, 1]
+
+        # Extract the appropriate depth readings
+        num_persons, body_part_count = U.shape
+        XYZ = np.zeros((num_persons, body_part_count, 3), dtype=np.float32)
+        for i in range(num_persons):
+            for j in range(body_part_count):
+                u, v = int(U[i, j]), int(V[i, j])
+                if v <= depth.shape[0] and u <= depth.shape[1]:
+                    XYZ[i, j, 2] = depth[v, u]
+        XYZ[:, :, 2] /= 1000.  # convert to meters
+
+        # Compute 3D coordinates in vectorized way
+        Z = XYZ[:, :, 2]
+        XYZ[:, :, 0] = (Z / self.fx) * (U - self.cx)
+        XYZ[:, :, 1] = (Z / self.fy) * (V - self.cy)
+        return XYZ
 
     def callback(self, ros_image, ros_depth):
         # Construct a frame with current time !before! pushing to OpenPose
@@ -130,7 +145,18 @@ class rosOpenPose:
 
         # Handle body points
         fr.persons = [Person() for _ in range(num_persons)]
-        try:
+        if num_persons != 0:
+            # Perform vectorized 3D computation for body keypoints
+            b_XYZ = self.compute_3D_vectorized(pose_kp, depth)
+
+            # Perform the vectorized operation for left hand
+            if lhand_detected:
+                lh_XYZ = self.compute_3D_vectorized(lhand_kp, depth)
+
+            # Do same for right hand
+            if rhand_detected:
+                rh_XYZ = self.compute_3D_vectorized(rhand_kp, depth)
+
             for person in range(num_persons):
                 fr.persons[person].bodyParts = [BodyPart() for _ in range(body_part_count)]
                 fr.persons[person].leftHandParts = [BodyPart() for _ in range(hand_part_count)]
@@ -138,14 +164,14 @@ class rosOpenPose:
 
                 detected_hands = []
                 if lhand_detected:
-                    detected_hands.append((lhand_kp, fr.persons[person].leftHandParts))
+                    detected_hands.append((lhand_kp, fr.persons[person].leftHandParts, lh_XYZ))
                 if rhand_detected:
-                    detected_hands.append((rhand_kp, fr.persons[person].rightHandParts))
+                    detected_hands.append((rhand_kp, fr.persons[person].rightHandParts, rh_XYZ))
 
                 # Process the body
                 for bp in range(body_part_count):
                     u, v, s = pose_kp[person, bp]
-                    x, y, z = self.convert_to_3d(u, v, depth)
+                    x, y, z = b_XYZ[person, bp]
                     arr = fr.persons[person].bodyParts[bp]
                     arr.pixel.x = u
                     arr.pixel.y = v
@@ -155,10 +181,10 @@ class rosOpenPose:
                     arr.point.z = z
 
                 # Process left and right hands
-                for hp in range(hand_part_count):
-                    for kp, harr in detected_hands:
+                for kp, harr, h_XYZ in detected_hands:
+                    for hp in range(hand_part_count):
                         u, v, s = kp[person, hp]
-                        x, y, z = self.convert_to_3d(u, v, depth)
+                        x, y, z = h_XYZ[person, hp]
                         arr = harr[hp]
                         arr.pixel.x = u
                         arr.pixel.y = v
@@ -166,10 +192,6 @@ class rosOpenPose:
                         arr.point.x = x
                         arr.point.y = y
                         arr.point.z = z
-
-        except IndexError as e:
-            rospy.logerr("Indexing error occurred: {}".format(e))
-            # return
 
         if self.display: self.frame = datum.cvOutputData.copy()
         self.pub.publish(fr)
