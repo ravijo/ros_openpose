@@ -47,11 +47,11 @@ class rosOpenPose:
         self.display = display
         self.frame = None
 
-        # This subscriber is run only once to populate necessary K matrix values.
+        # Populate necessary K matrix values for 3D pose computation.
         cam_info = rospy.wait_for_message(cam_info_topic, CameraInfo)
         self.fx = cam_info.K[0]
-        self.fy = cam_info.K[2]
-        self.cx = cam_info.K[4]
+        self.fy = cam_info.K[4]
+        self.cx = cam_info.K[2]
         self.cy = cam_info.K[5]
 
         # Function wrappers for OpenPose version discrepancies
