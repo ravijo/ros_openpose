@@ -89,7 +89,7 @@ class rosOpenPose:
         for i in range(num_persons):
             for j in range(body_part_count):
                 u, v = int(U[i, j]), int(V[i, j])
-                if v <= depth.shape[0] and u <= depth.shape[1]:
+                if v < depth.shape[0] and u < depth.shape[1]:
                     XYZ[i, j, 2] = depth[v, u]
         XYZ[:, :, 2] /= 1000.  # convert to meters
 
