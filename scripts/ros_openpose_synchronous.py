@@ -30,10 +30,6 @@ OPENPOSE1POINT7_OR_HIGHER = 'VectorDatum' in op.__dict__
 
 class rosOpenPose:
     def __init__(self, frame_id, no_depth, pub_topic, color_topic, depth_topic, cam_info_topic, op_wrapper, display):
-        image_sub = message_filters.Subscriber(color_topic, Image)
-        depth_sub = message_filters.Subscriber(depth_topic, Image)
-        self.ts = message_filters.ApproximateTimeSynchronizer([image_sub, depth_sub], 1, 0.01)
-        self.ts.registerCallback(self.callback)
 
         self.pub = rospy.Publisher(pub_topic, Frame, queue_size=10)
 
@@ -54,6 +50,10 @@ class rosOpenPose:
         self.cx = cam_info.K[2]
         self.cy = cam_info.K[5]
 
+        # Obtain depth topic encoding
+        encoding = rospy.wait_for_message(depth_topic, Image).encoding
+        self.mm_to_m = 0.001 if encoding == "16UC1" else 1.
+
         # Function wrappers for OpenPose version discrepancies
         if OPENPOSE1POINT7_OR_HIGHER:
             self.emplaceAndPop = lambda datum: self.op_wrapper.emplaceAndPop(op.VectorDatum([datum]))
@@ -61,6 +61,11 @@ class rosOpenPose:
         else:
             self.emplaceAndPop = lambda datum: self.op_wrapper.emplaceAndPop([datum])
             self.detect = lambda kp: kp.shape != ()
+
+        image_sub = message_filters.Subscriber(color_topic, Image)
+        depth_sub = message_filters.Subscriber(depth_topic, Image)
+        self.ts = message_filters.ApproximateTimeSynchronizer([image_sub, depth_sub], 1, 0.01)
+        self.ts.registerCallback(self.callback)
 
         """ OpenPose skeleton dictionary
         {0, "Nose"}, {13, "LKnee"}
@@ -91,7 +96,8 @@ class rosOpenPose:
                 u, v = int(U[i, j]), int(V[i, j])
                 if v < depth.shape[0] and u < depth.shape[1]:
                     XYZ[i, j, 2] = depth[v, u]
-        XYZ[:, :, 2] /= 1000.  # convert to meters
+
+        XYZ[:, :, 2] *= self.mm_to_m  # convert to meters
 
         # Compute 3D coordinates in vectorized way
         Z = XYZ[:, :, 2]
@@ -109,7 +115,7 @@ class rosOpenPose:
         image = depth = None
         try:
             image = self.bridge.imgmsg_to_cv2(ros_image, "bgr8")
-            depth = self.bridge.imgmsg_to_cv2(ros_depth, "32FC1")
+            depth = self.bridge.imgmsg_to_cv2(ros_depth, "passthrough")
         except CvBridgeError as e:
             rospy.logerr("CvBridge Error: {0}".format(e))
 
