@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   image_transport
   message_generation
+  message_filters
 )
 
 ## Make sure 'FindGFlags.cmake' and 'FindGlog.cmake' are visible to cmake
@@ -59,6 +60,8 @@ catkin_package(
   std_msgs
   geometry_msgs
   message_runtime
+  sensor_msgs
+  message_filters
 )
 
 ## Build
@@ -83,21 +86,33 @@ link_directories(
 
 # Declare a C++ executable and
 # specify libraries to link a executable target against
-add_executable(rosOpenpose
-  src/rosOpenpose.cpp
+add_executable(rosOpenposeAsync
+  src/rosOpenposeAsync.cpp
   src/cameraReader.cpp)
+
+add_executable(rosOpenposeSync
+  src/rosOpenposeSync.cpp)
 
 # Bug fix
 # src: https://github.com/ravijo/ros_openpose/issues/14#issuecomment-631164300
-add_dependencies(rosOpenpose ros_openpose_generate_messages_cpp)
+add_dependencies(rosOpenposeAsync ros_openpose_generate_messages_cpp)
+add_dependencies(rosOpenposeSync ros_openpose_generate_messages_cpp)
 
-target_link_libraries(rosOpenpose
+target_link_libraries(rosOpenposeAsync
   ${OpenPose_LIBS}
   ${GFLAGS_LIBRARY}
   ${GLOG_LIBRARY}
   ${OpenCV_LIBS}
   ${catkin_LIBRARIES}
 )
+
+target_link_libraries(rosOpenposeSync
+        ${OpenPose_LIBS}
+        ${GFLAGS_LIBRARY}
+        ${GLOG_LIBRARY}
+        ${OpenCV_LIBS}
+        ${catkin_LIBRARIES}
+        )
 
 add_executable(testCameraReader
   src/testCameraReader.cpp

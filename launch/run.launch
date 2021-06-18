@@ -9,8 +9,8 @@ Date: 2019/11/23
   <!-- set this flag to switch ros_openpose to a synchronous setting -->
   <arg name="synchronous" default="false" />
 
-  <!-- specify path of python openpose library (only necessary if synchronous setting is being used) -->
-  <arg name="py_openpose_path" default="/usr/local/python" />
+  <!-- specify path to python openpose library (specifying this will switch synchronous setting from c++ to python) -->
+  <arg name="py_openpose_path" default="none" />
 
   <!-- the value of this argument can only be one of the following: realsense, kinect, zed2, nodepth -->
   <arg name="camera" default="realsense" />
