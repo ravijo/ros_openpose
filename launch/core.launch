@@ -24,20 +24,33 @@ Date: 2020/03/02
   <arg name="py_openpose_path" default="" />
 
   <group if="$(arg synchronous)" >
-    <!-- invoke synchronous node -->
-    <node name="rosOpenpose" pkg="ros_openpose" type="ros_openpose_synchronous.py" output="screen" required="true" args="$(arg openpose_args)" >
-      <param name="frame_id" value="$(arg frame_id)" />
-      <param name="no_depth" value="$(arg no_depth)" />
-      <param name="pub_topic" value="$(arg pub_topic)" />
-      <param name="color_topic" value="$(arg color_topic)" />
-      <param name="depth_topic" value="$(arg depth_topic)" />
-      <param name="cam_info_topic" value="$(arg cam_info_topic)" />
-      <param name="py_openpose_path" value="$(arg py_openpose_path)" />
-    </node>
+    <!-- invoke c++ synchronous node -->
+    <group if="$(eval py_openpose_path == 'none')" >
+      <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenposeSync" output="screen" required="true" args="$(arg openpose_args)" >
+        <param name="frame_id" value="$(arg frame_id)" />
+        <param name="no_depth" value="$(arg no_depth)" />
+        <param name="pub_topic" value="$(arg pub_topic)" />
+        <param name="color_topic" value="$(arg color_topic)" />
+        <param name="depth_topic" value="$(arg depth_topic)" />
+        <param name="cam_info_topic" value="$(arg cam_info_topic)" />
+      </node>
+    </group>
+    <!-- invoke python synchronous node -->
+    <group unless="$(eval py_openpose_path == 'none')" >
+      <node name="rosOpenpose" pkg="ros_openpose" type="ros_openpose_synchronous.py" output="screen" required="true" args="$(arg openpose_args)" >
+        <param name="frame_id" value="$(arg frame_id)" />
+        <param name="no_depth" value="$(arg no_depth)" />
+        <param name="pub_topic" value="$(arg pub_topic)" />
+        <param name="color_topic" value="$(arg color_topic)" />
+        <param name="depth_topic" value="$(arg depth_topic)" />
+        <param name="cam_info_topic" value="$(arg cam_info_topic)" />
+        <param name="py_openpose_path" value="$(arg py_openpose_path)" />
+      </node>
+    </group>
   </group>
   <group unless="$(arg synchronous)" >
     <!-- invoke asynchronous node -->
-    <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenpose" output="screen" required="true" args="$(arg openpose_args)" >
+    <node name="rosOpenpose" pkg="ros_openpose" type="rosOpenposeAsync" output="screen" required="true" args="$(arg openpose_args)" >
       <param name="frame_id" value="$(arg frame_id)" />
       <param name="no_depth" value="$(arg no_depth)" />
       <param name="pub_topic" value="$(arg pub_topic)" />
