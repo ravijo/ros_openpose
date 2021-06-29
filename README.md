@@ -103,11 +103,12 @@ The main launch file is `run.launch`. It has the following important arguments-
 ## Implementation Versions Info.
 * **Synchronous API**  (see [thanks](#thanks) section)
   * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
-  * Uses OpenPose Python bindings. Therefore, please compile OpenPose accordingly
   * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
     ```
     roslaunch ros_openpose run.launch camera:=realsense synchronous:=true py_openpose_path:=absolute_path_to_py_openpose
     ```
+  * If the arg `py_openpose_path` is not specified, then the CPP node is used. Otherwise, the python node is used. Therefore, please compile OpenPose accordingly if you plan to use python bindings of the OpenPose.
+
 * **Asynchronous API**
   * Uses two workers, `op::WorkerProducer` and `op::WorkerConsumer` workers provided by OpenPose
   * Uses OpenPose CPP APIs
