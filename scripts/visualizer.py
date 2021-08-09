@@ -105,6 +105,7 @@ class RealtimeVisualization():
         marker.action = Marker.ADD
         marker.type = marker_type
         marker.scale = Vector3(size, size, size)
+        marker.pose.orientation.w = 1
         marker.header.stamp = time
         marker.header.frame_id = self.skeleton_frame
         marker.lifetime = rospy.Duration(1)  # 1 second
