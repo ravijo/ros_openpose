@@ -233,7 +233,7 @@ If you used `ros_openpose` for your work, please cite it.
 
 ```tex
 @misc{ros_openpose,
-    author = {Joshi, Ravi P. and Broek, Marike K. and Tan, Xiang Zhi and Choi, Andrew and Luo, Rui},
+    author = {Joshi, Ravi P. and van den Broek, Marike K and Tan, Xiang Zhi and Choi, Andrew and Luo, Rui},
     title = {{ROS OpenPose}},
     year = {2019},
     publisher = {GitHub},
