@@ -16,6 +16,15 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     <sup>Sample video showing visualization on RViz</sup>
 </p>
 
+## edit by fukuda (2021/9/20)
+ros_openpose/script/visualizer.py is an edited one.
+if you want to use original script, please replace with ros_openpose/script/sub.py and ros_openpose/script/visualizer.py
+
+add msgs
+```
+AltMarker.msg
+AltMarkerArray.msg
+```
 
 ## Supported OpenPose Versions
 * 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)

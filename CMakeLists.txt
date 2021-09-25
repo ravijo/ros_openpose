@@ -25,6 +25,7 @@ find_package(Glog)
 find_package(OpenCV REQUIRED)
 find_package(OpenPose REQUIRED)
 find_package(OpenMP)
+find_package(Threads REQUIRED)
 
 if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -45,6 +46,8 @@ add_message_files(
   BodyPart.msg
   Person.msg
   Frame.msg
+  AltMarker.msg
+  AltMarkerArray.msg
 )
 
 generate_messages(

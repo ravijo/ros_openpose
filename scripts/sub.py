@@ -11,10 +11,9 @@ import rospy
 from ros_openpose.msg import Frame
 from std_msgs.msg import ColorRGBA
 from geometry_msgs.msg import Vector3, Point
-#from visualization_msgs.msg import Marker, MarkerArray
-from ros_openpose.msg import AltMarker as Marker
-from ros_openpose.msg import AltMarkerArray as MarkerArray
-
+from visualization_msgs.msg import Marker,MarkerArray
+#from ros_openpose.msg import AltMarker as Marker
+#from ros_openpose.msg import AltMarkerArray as MarkerArray
 
 class RealtimeVisualization():
     def __init__(self, ns, frame_topic, skeleton_frame, id_text_size, id_text_offset, skeleton_hands, skeleton_line_width):
@@ -41,6 +40,7 @@ class RealtimeVisualization():
             1) upper_body : from nose to mid hip
             2) hands : from left-hand wrist to right-hand wrist
             3) legs : from left foot toe to right foot toe
+
         See the link below to get the id of each joint as defined in Kinect v2
         src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/output.md#keypoint-ordering
         Result for BODY_25 (25 body parts consisting of COCO + foot)
@@ -58,6 +58,8 @@ class RealtimeVisualization():
             {10,     "RKnee"},    {23,  "RSmallToe"}
             {11,    "RAnkle"},    {24,      "RHeel"}
             {12,      "LHip"},    {25, "Background"}
+
+
         hand output ordering
         src: https://github.com/CMU-Perceptual-Computing-Lab/openpose/raw/master/doc/media/keypoints_hand.png
         We are using 5 LINE_STRIP to draw a hand
@@ -141,14 +143,13 @@ class RealtimeVisualization():
             # assign 3D positions to each body part
             # make sure to consider only valid body parts
             for index, body_part in enumerate(self.body_parts):
-                #body_marker[index].points = [person.bodyParts[idx].point for idx in body_part if self.isValid(person.bodyParts[idx])]
-                body_marker[index].body_part=[]
-                body_marker[index].points=[]
-                for idx in body_part:
-                    if self.isValid(person.bodyParts[idx]):
-                            body_marker[index].points.append(person.bodyParts[idx].point)
-                            body_marker[index].body_part.append(idx)
-
+                body_marker[index].points = [person.bodyParts[idx].point for idx in body_part if self.isValid(person.bodyParts[idx])
+               # body_marker[index].body_part=[]
+               # body_marker[index].points=[]
+                #for idx in body_part:
+                 #   if self.isValid(person.bodyParts[idx]:
+                  #          body_marker[index].points.append(person.bodyParts[idx].point)
+                        #    body_marker[index].body_part.append(idx)
             marker_array.markers.extend(body_marker)
 
             if self.skeleton_hands:
