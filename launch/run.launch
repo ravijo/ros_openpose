@@ -32,10 +32,10 @@ Date: 2019/11/23
    to do so, please change the value, as shown in the example below.
   -->
   <?ignore
-    <arg name="openpose_args" value="--hand --disable_multi_thread --model_folder /home/ravi/openpose/models/" />
+    <arg name="openpose_args" value="--hand --disable_multi_thread --model_folder /home/mimi/openpose/models/" />
   ?>
   <!-- full path to the model dir of openpose -->
-  <arg name="openpose_args" value="--model_folder /home/ravi/openpose/models/" />
+  <arg name="openpose_args" value="--model_folder /home/mimi/openpose/models/" />
 
   <!-- rostopic to publish the 3D skeleton data -->
   <arg name="pub_topic" default="/frame" />
