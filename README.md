@@ -26,6 +26,39 @@ AltMarker.msg
 AltMarkerArray.msg
 ```
 
+## About Topic(visualizer.py)
+### finger falseの場合
+-#### AltMarkerArray.makers[0]
+>body_part=[0, 1, 8](upper_body_ids)
+
+-### AltMarkerArray.makers[1]
+>body_part=[4, 3, 2, 1, 5, 6, 7] (hands_ids)
+
+-### AltMarkerArray.makers[2]
+>body_part=[22, 11, 10, 9, 8, 12, 13, 14, 19] (legs_ids)
+
+#### id means
+
+```
+	    { 0,      "Nose"},    {13,      "LKnee"}
+            { 1,      "Neck"},    {14,     "LAnkle"}
+            { 2, "RShoulder"},    {15,       "REye"}
+            { 3,    "RElbow"},    {16,       "LEye"}
+            { 4,    "RWrist"},    {17,       "REar"}
+            { 5, "LShoulder"},    {18,       "LEar"}
+            { 6,    "LElbow"},    {19,    "LBigToe"}
+            { 7,    "LWrist"},    {20,  "LSmallToe"}
+            { 8,    "MidHip"},    {21,      "LHeel"}
+            { 9,      "RHip"},    {22,    "RBigToe"}
+            {10,     "RKnee"},    {23,  "RSmallToe"}
+            {11,    "RAnkle"},    {24,      "RHeel"}
+            {12,      "LHip"},    {25, "Background"}
+```
+#### get postion exsample
+```
+AltMarkerArray.makers[2].points[receive_msg[2].body_part.index(4)].x
+```
+
 ## Supported OpenPose Versions
 * 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
 * 1.6.0 (see [thanks](#thanks) section)
