@@ -45,5 +45,5 @@ bool mesh_use_embedded_materials
 
 
 #origin
-int32[] body_part
+int[] body_part
 
