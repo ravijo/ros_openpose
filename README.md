@@ -56,7 +56,9 @@ AltMarkerArray.msg
 ```
 #### get postion exsample
 ```
-AltMarkerArray.makers[2].points[receive_msg[2].body_part.index(4)].x
+#右手首の情報を取得する場合
+#makers[2]はlegs_ids
+AltMarkerArray.makers[2].points[AltMarkerArray.makers[2].body_part.index(4)].x
 ```
 
 ## Supported OpenPose Versions
