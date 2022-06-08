@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## Make sure 'FindGFlags.cmake' and 'FindGlog.cmake' are visible to cmake
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+list(APPEND "/home/app/openpose" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ## Add OpenPose and other dependencies
 find_package(GFlags)
@@ -100,7 +100,7 @@ add_dependencies(rosOpenposeSync ros_openpose_generate_messages_cpp)
 
 target_link_libraries(rosOpenposeAsync
   ${OpenPose_LIBS}
-  ${GFLAGS_LIBRARY}
+  gflags ${GFLAGS_LIBRARY}
   ${GLOG_LIBRARY}
   ${OpenCV_LIBS}
   ${catkin_LIBRARIES}
@@ -108,7 +108,7 @@ target_link_libraries(rosOpenposeAsync
 
 target_link_libraries(rosOpenposeSync
         ${OpenPose_LIBS}
-        ${GFLAGS_LIBRARY}
+        gflags ${GFLAGS_LIBRARY}
         ${GLOG_LIBRARY}
         ${OpenCV_LIBS}
         ${catkin_LIBRARIES}
