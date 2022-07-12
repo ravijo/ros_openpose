@@ -16,16 +16,19 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     <sup>Sample video showing visualization on RViz</sup>
 </p>
 
+##Overview
+1. [Dependencies](#dependencies)
 
-## Supported OpenPose Versions
-* 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
-* 1.6.0 (see [thanks](#thanks) section)
-* 1.5.1
-* 1.5.0
 
 
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+  Supported OpenPose Versions:
+  * 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
+  * 1.6.0 (see [thanks](#thanks) section)
+  * 1.5.1
+  * 1.5.0
+
 
 
 Note: Additionally, camera-specific ROS drivers such as following are required as per your camera model-
