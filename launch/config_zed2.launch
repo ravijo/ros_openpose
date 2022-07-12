@@ -17,7 +17,7 @@ Date: 2020/04/16
   <arg name="color_topic" default="/zed2/zed_node/rgb/image_rect_color" />
 
   <!-- rostopic to subscribe for depth images -->
-  <arg name="depth_topic" default="/zed2/zed_node/depth/depth_raw_registered" />
+  <arg name="depth_topic" default="/zed2/zed_node/depth/depth_registered" />
 
   <!-- rostopic to subscribe for camera calibration parameters -->
   <arg name="cam_info_topic" default="/zed2/zed_node/rgb/camera_info" />

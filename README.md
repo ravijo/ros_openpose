@@ -139,7 +139,7 @@ The main launch file is `run.launch`. It has the following important arguments-
 
 
 ## Steps to Run with Stereolabs ZED2 Camera
-1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `0`).
+1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `false`).
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
