@@ -16,10 +16,6 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     <sup>Sample video showing visualization on RViz</sup>
 </p>
 
-##Overview
-1. [Dependencies](#dependencies)
-
-
 
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
