@@ -16,16 +16,19 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
     <sup>Sample video showing visualization on RViz</sup>
 </p>
 
+##Overview
+1. [Dependencies](#dependencies)
 
-## Supported OpenPose Versions
-* 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
-* 1.6.0 (see [thanks](#thanks) section)
-* 1.5.1
-* 1.5.0
 
 
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+  Supported OpenPose Versions:
+  * 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
+  * 1.6.0 (see [thanks](#thanks) section)
+  * 1.5.1
+  * 1.5.0
+
 
 
 Note: Additionally, camera-specific ROS drivers such as following are required as per your camera model-
@@ -139,7 +142,7 @@ The main launch file is `run.launch`. It has the following important arguments-
 
 
 ## Steps to Run with Stereolabs ZED2 Camera
-1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `0`).
+1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `false`).
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
