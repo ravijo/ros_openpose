@@ -24,7 +24,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 1. [Installation](#installation)
    * [Troubleshooting](#troubleshooting)
 1. [Configuration](#configuration)
-1. [Run Variations](#runvar)
+1. [Operation Modes and APIs](#runvar)
 1. Camera Run Instructions:
    * [Color Camera](#rgbcam)
    * [Intel RealSense](#intelrs)
@@ -125,7 +125,7 @@ The main launch file is `run.launch`. It has the following important arguments-
 
 
 <a name="runvar"></a>
-## Run Variations
+## Operation Modes and APIs
 * **Synchronous API**  (see [thanks](#thanks) section)
   * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
   * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
@@ -141,7 +141,7 @@ The main launch file is `run.launch`. It has the following important arguments-
 
 
 <a name="rgbcam"></a>
-## Steps to Run with any  Camera such as Webcam etc.
+## Steps to Run with any Color Camera such as Webcam etc.
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
