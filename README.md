@@ -25,7 +25,7 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
    * [Troubleshooting](#troubleshooting)
 1. [Configuration](#configuration)
 1. [Operation Modes and APIs](#runvar)
-1. Camera Run Instructions:
+1. [Camera Run Instructions:](#camrun)
    * [Color Camera](#rgbcam)
    * [Intel RealSense](#intelrs)
    * [Microsoft Kinect v2](#kinv2)
@@ -140,8 +140,10 @@ The main launch file is `run.launch`. It has the following important arguments-
   * By default this version is enabled. Users are advised to try `synchronous:=true` if not satisfied with the performance.
 
 
+<a name="camrun"></a>
+## Camera Run Instructions
 <a name="rgbcam"></a>
-## Steps to Run with any Color Camera such as Webcam etc.
+### Steps to Run with any Color Camera such as Webcam etc.
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
@@ -160,7 +162,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 
 <a name="intelrs"></a>
-## Steps to Run with Intel RealSense Camera
+### Steps to Run with Intel RealSense Camera
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
@@ -172,7 +174,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 
 <a name="kinv2"></a>
-## Steps to Run with Microsoft Kinect v2 Camera
+### Steps to Run with Microsoft Kinect v2 Camera
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
@@ -184,7 +186,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 
 <a name="azkin"></a>
-## Steps to Run with Azure Kinect Camera
+### Steps to Run with Azure Kinect Camera
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
@@ -196,7 +198,7 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 
 <a name="zed2"></a>
-## Steps to Run with Stereolabs ZED2 Camera
+### Steps to Run with Stereolabs ZED2 Camera
 1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `false`).
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
