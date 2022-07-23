@@ -2,11 +2,13 @@
 
 ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 
+
+- [x] Any color camera such as webcam etc :heavy_check_mark:
 - [x] Intel RealSense Camera :heavy_check_mark:
 - [x] Microsoft Kinect v2 Camera :heavy_check_mark:
 - [x] Stereolabs ZED2 Camera :heavy_check_mark: (see [thanks](#thanks) section)
 - [x] Azure Kinect Camera :heavy_check_mark:
-- [x] Any color camera such as webcam etc :heavy_check_mark:
+
 
 </br>
 
@@ -17,8 +19,31 @@ ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
 </p>
 
 
+## Overview
+1. [Dependencies](#dependencies)
+1. [Installation](#installation)
+   * [Troubleshooting](#troubleshooting)
+1. [Configuration](#configuration)
+1. [Operation Modes and APIs](#runvar)
+1. [Camera Run Instructions:](#camrun)
+   * [Color Camera](#rgbcam)
+   * [Intel RealSense](#intelrs)
+   * [Microsoft Kinect v2](#kinv2)
+   * [Azure Kinect](#azkin)
+   * [Stereolabs Zed2](#zed2) 
+1. [FAQ](#faq)
+1. [Test Configuration](#pkgtest)
+1. [Citation](#citation)
+1. [Issues](#issues)
+1. [Thanks](#thanks)
+
+
+
+
+
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+
   Supported OpenPose Versions:
   * 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
   * 1.6.0 (see [thanks](#thanks) section)
@@ -44,7 +69,7 @@ chmod +x *.py
 ```
 
 
-## Troubleshooting
+### Troubleshooting
 1. While compiling the package, if the following error is reported at the terminal-
     ```
     error: no matching function for call to ‘op::WrapperStructPose::WrapperStructPose(<brace-enclosed initializer list>)’
@@ -99,7 +124,8 @@ The main launch file is `run.launch`. It has the following important arguments-
 1. `camera`: It can only be one of the following: `realsense`, `kinect`, `zed2`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
-## Implementation Versions Info.
+<a name="runvar"></a>
+## Operation Modes and APIs
 * **Synchronous API**  (see [thanks](#thanks) section)
   * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
   * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
@@ -114,53 +140,10 @@ The main launch file is `run.launch`. It has the following important arguments-
   * By default this version is enabled. Users are advised to try `synchronous:=true` if not satisfied with the performance.
 
 
-
-## Steps to Run with Intel RealSense Camera
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch
-    ```
-
-
-## Steps to Run with Microsoft Kinect v2 Camera
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch camera:=kinect
-    ```
-
-
-## Steps to Run with Stereolabs ZED2 Camera
-1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `false`).
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch camera:=zed2
-    ```
-
-
-## Steps to Run with Azure Kinect Camera
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch camera:=azurekinect
-    ```
-
-
-## Steps to Run with any Color Camera such as Webcam etc.
+<a name="camrun"></a>
+## Camera Run Instructions
+<a name="rgbcam"></a>
+### Steps to Run with any Color Camera such as Webcam etc.
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
@@ -176,6 +159,55 @@ Note: To confirm that ROS package of your camera is working properly, please che
 rosrun image_view image_view image:=YOUR_ROSTOPIC
 ```
 Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
+
+
+<a name="intelrs"></a>
+### Steps to Run with Intel RealSense Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch
+    ```
+
+
+<a name="kinv2"></a>
+### Steps to Run with Microsoft Kinect v2 Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch camera:=kinect
+    ```
+
+
+<a name="azkin"></a>
+### Steps to Run with Azure Kinect Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch camera:=azurekinect
+    ```
+
+
+<a name="zed2"></a>
+### Steps to Run with Stereolabs ZED2 Camera
+1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `false`).
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch camera:=zed2
+    ```
 
 
 ## FAQ
@@ -209,7 +241,8 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
    You can use `cmake` as well. See [here]( https://github.com/ravijo/ros_openpose/blob/b4598b719e5699eb69f80d917a154e008e935c77/CMakeLists.txt#L37)
 
 
-## Note
+<a name="pkgtest"></a>
+## Note on Test Configuration
 This package has been tested on the following environment configuration-
 
 | Name      | Value                                  |
@@ -241,7 +274,8 @@ If you used `ros_openpose` for your work, please cite it.
 }
 ```
 
-## Issues (or Error Reporting)
+<a name="issues"></a>
+## Issues (or Error Reporting) 
 Please check [here](https://github.com/ravijo/ros_openpose/issues) and create issues accordingly.
 
 
