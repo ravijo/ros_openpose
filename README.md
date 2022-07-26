@@ -142,6 +142,9 @@ The main launch file is `run.launch`. It has the following important arguments-
 
 <a name="camrun"></a>
 ## Camera Run Instructions
+In this section you will find the instructions for running ros_openpose with one of the following cameras: Color camera, Realsense, Kinect v2, Azure Kinect, ZED2.
+If you have a different camera and would like to use ros_openpose with depth properties, please turn to the [FAQ](#faq) section for tips and guidance on how to achieve this.
+
 <a name="rgbcam"></a>
 ### Steps to Run with any Color Camera such as Webcam etc.
 1. Make sure that ROS env is sourced properly by executing the following command-
@@ -212,14 +215,18 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 ## FAQ
 1. **How to add my own depth camera into this wrapper?**
-
-    Go inside `launch` subdirectory and make a copy of `config_realsense.launch` as `config_mycamera.launch`. Make necessary changes to the `color_topic`, `depth_topic`, `cam_info_topic` and `frame_id` arguments. More inforation is given below-
+   You might be able to add your own depth camera by creating your own Config_<camera_name>.launch file based on one of the existing ones and modify it to suit your specific camera.
+    Go inside the `launch` subdirectory and make a copy of `config_realsense.launch` and save it as `config_<camera_name>.launch`. Remember that whatever you choose as the camera_namei, should be used as an argument when launching the run.launch to run ros_openpose. Make necessary changes to the `color_topic`, `depth_topic`, `cam_info_topic` and `frame_id` arguments in the file. Make sure that:
     * Input depth images are aligned to the color images already. 
     * Depth and color images have the same dimension. Therefore, each pixel from the color image can be mapped to corresponding depth pixel at the same x, y location. 
     * The depth images contain depth values in millimeters and represented by `TYPE_16UC1` using OpenCV.
     * The `cam_info_topic` is containing camera calibration parameters supplied by the manufacturer.
 
+   To achieve visualisations you also need to create new modified versions of the rviz scripts only_person_<camera_name>.rviz and person_pointcloud_<camera_name>.rviz .
+
     Please check [here](https://github.com/ravijo/ros_openpose/issues/9) for a similar question.
+
+   If you successfully create modified files and run ros_openpose with a depth camera that is not mentioned here, please share your files and necessary steps for running with your camera such this uswful information can be made available to others.
 
 2. **How to run this wrapper with limited resources such as low GPU, RAM, etc.?**
 
