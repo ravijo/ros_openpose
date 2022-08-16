@@ -14,7 +14,7 @@ ROS wrapper for OpenPose | It supports *(currently, but others are planned)*-
 
 
 <p align="center">
-    <img src="files/ros_openpose.gif", width="800">
+    <img src="files/ros_openpose.gif" alt="gif showing demo of ros_openpose" />
     </br>
     <sup>Sample video showing visualization on RViz</sup>
 </p>
