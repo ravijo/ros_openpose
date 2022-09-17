@@ -270,7 +270,7 @@ This package has been tested on the following environment configuration-
 If you used `ros_openpose` for your work, please cite it.
 ```tex
 @misc{ros_openpose,
-    author = {Joshi, Ravi P. and van den Broek, Marike K and Tan, Xiang Zhi and Choi, Andrew and Luo, Rui},
+    author = {Joshi, Ravi P. and Choi, Andrew and Tan, Xiang Zhi and Van den Broek, Marike K and Luo, Rui and Choi, Brian},
     title = {{ROS OpenPose}},
     year = {2019},
     publisher = {GitHub},
@@ -287,8 +287,8 @@ Please check [here](https://github.com/ravijo/ros_openpose/issues) and create is
 
 ## Thanks
 Following authors are sincerely acknowledged for the improvements of this package-
-* [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
-* [Xiang Zhi Tan](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
 * [Andrew Choi](https://github.com/QuantuMope): For providing synchronous version i.e., `op_wrapper.emplaceAndPop()` support for OpenPose 1.6
+* [Xiang Zhi Tan](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
+* [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
 * [Rui Luo](https://github.com/luorui93): For fixing a crash in ros_openpose_synchronous.py when nobody or only partial body is visible
-* [Booyeon](https://github.com/BrianChoi12): Fixing gflags library issue causing compilation error
+* [Brian Choi](https://github.com/BrianChoi12): Fixing gflags library issue causing compilation error
