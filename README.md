@@ -1,17 +1,20 @@
 # ros_openpose
 
-ROS wrapper for OpenPose | It supports *(currently but others are planned)*-
+ROS wrapper for OpenPose | It supports *(currently, but others are planned)*-
 
+
+- [x] Any color camera such as webcam etc :heavy_check_mark:
 - [x] Intel RealSense Camera :heavy_check_mark:
 - [x] Microsoft Kinect v2 Camera :heavy_check_mark:
 - [x] Stereolabs ZED2 Camera :heavy_check_mark: (see [thanks](#thanks) section)
 - [x] Azure Kinect Camera :heavy_check_mark:
-- [x] Any color camera such as webcam etc :heavy_check_mark:
+
 
 </br>
 
+
 <p align="center">
-    <img src="files/ros_openpose.gif", width="800">
+    <img src="files/ros_openpose.gif" alt="gif showing demo of ros_openpose" />
     </br>
     <sup>Sample video showing visualization on RViz</sup>
 </p>
@@ -61,18 +64,37 @@ AltMarkerArray.msg
 AltMarkerArray.makers[2].points[AltMarkerArray.makers[2].body_part.index(4)].x
 ```
 
-## Supported OpenPose Versions
-* 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
-* 1.6.0 (see [thanks](#thanks) section)
-* 1.5.1
-* 1.5.0
+## Overview
+1. [Dependencies](#dependencies)
+1. [Installation](#installation)
+   * [Troubleshooting](#troubleshooting)
+1. [Configuration](#configuration)
+1. [Operation Modes and APIs](#runvar)
+1. [Camera Run Instructions:](#camrun)
+   * [Color Camera](#rgbcam)
+   * [Intel RealSense](#intelrs)
+   * [Microsoft Kinect v2](#kinv2)
+   * [Azure Kinect](#azkin)
+   * [Stereolabs Zed2](#zed2) 
+1. [FAQ](#faq)
+1. [Test Configuration](#pkgtest)
+1. [Citation](#citation)
+1. [Issues](#issues)
+1. [Thanks](#thanks)
 
 
 ## Dependencies
 * [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
 
 
-Note: Additionally, camera-specific ROS drivers such as following are required as per your camera model-
+  Supported OpenPose Versions:
+  * 1.7.0 *latest* (see point #1 in [troubleshooting](#troubleshooting) section)
+  * 1.6.0 (see [thanks](#thanks) section)
+  * 1.5.1
+  * 1.5.0
+
+
+Note: Additionally, camera-specific ROS drivers such as the following are required as per your camera model-
 * [realsense-ros](https://github.com/IntelRealSense/realsense-ros): For Intel RealSense Camera
 * [iai_kinect2](https://github.com/code-iai/iai_kinect2): For Microsoft Kinect v2 Camera
 * [zed-ros-wrapper](https://github.com/stereolabs/zed-ros-wrapper): For Stereolabs ZED2 Camera
@@ -81,20 +103,20 @@ Note: Additionally, camera-specific ROS drivers such as following are required a
 
 ## Installation
 1. Make sure to download the complete repository. Use `git clone https://github.com/ravijo/ros_openpose.git` or download zip as per your convenience.
-1. Invoke catkin tool inside ros workspace i.e., `catkin_make`
-1. Make python scripts executable by using command below-
-```bash
-roscd ros_openpose/scripts
-chmod +x *.py
-```
+1. Invoke catkin tool inside ros workspace, i.e., `catkin_make`
+1. Make python scripts executable by using the commands below-
+    ```bash
+    roscd ros_openpose/scripts
+    chmod +x *.py
+    ```
 
 
-## Troubleshooting
+### Troubleshooting
 1. While compiling the package, if the following error is reported at the terminal-
     ```
     error: no matching function for call to ‘op::WrapperStructPose::WrapperStructPose(<brace-enclosed initializer list>)’
     ```
-    In this case, please checkout OpenPose version 1.7.0 by running the following command at the root directory of OpenPose installation-
+    In this case, please checkout OpenPose version 1.7.0 by running the following command at the root directory of the OpenPose installation-
     ```bash
     git checkout tags/v1.7.0
     ```
@@ -106,12 +128,12 @@ chmod +x *.py
 
     error: invalid initialization of reference of type ‘const op::String&’ from expression of type ‘fLS::clstring {aka std::__cxx11::basic_string<char>}’
     ```
-    In this case, please checkout OpenPose version 1.6.0 by running the following command at the root directory of OpenPose installation-
+    In this case, please checkout OpenPose version 1.6.0 by running the following command at the root directory of the OpenPose installation-
     ```bash
     git checkout tags/v1.6.0
     ```
     Do not forget to run `sudo make install` to install the OpenPose system-wide.
-1. If compliation fails by showing the following error-
+1. If compilation fails by showing the following error-
     ```
     /usr/bin/ld: cannot find -lThreads::Threads
     ```
@@ -124,13 +146,13 @@ chmod +x *.py
     ```
     error: no match for ‘operator=’ (operand types are ‘op::Matrix’ and ‘const cv::Mat’)
     ```
-    In this case, please update the OpenPose. Most likely, an old version of OpenPose is installed. So please checkout Openpose from the master branch as [described here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#update-openpose). Alternatively, you can checkout OpenPose version 1.5.1 by running the following command at the root directory of OpenPose installation-
+    In this case, please update the OpenPose. Most likely, an old version of OpenPose is installed. So please checkout Openpose from the master branch as [described here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#update-openpose). Alternatively, you can checkout OpenPose version 1.5.1 by running the following command at the root directory of the OpenPose installation-
     ```bash
     git checkout tags/v1.5.1
     ```
     Do not forget to run `sudo make install` to install the OpenPose system-wide.</s> *Note that OpenPose version 1.5.1 is still supported.*
-    
-    
+
+
 ## Configuration
 The main launch file is `run.launch`. It has the following important arguments-
 1. `model_folder`: It represents the full path to the model directory of OpenPose. Kindly modify it as per OpenPose installation in your machine. Please edit `run.launch` file as shown below-
@@ -144,7 +166,8 @@ The main launch file is `run.launch`. It has the following important arguments-
 1. `camera`: It can only be one of the following: `realsense`, `kinect`, `zed2`, `nodepth`. Default value of this argument is `realsense`. See below for more information.
 
 
-## Implementation Versions Info.
+<a name="runvar"></a>
+## Operation Modes and APIs
 * **Synchronous API**  (see [thanks](#thanks) section)
   * Uses `op_wrapper.emplaceAndPop()` method provided by OpenPose
   * By default this version is disabled. Therefore, please set `synchronous:=true` and provide `py_openpose_path` while calling `run.launch`. For example:
@@ -152,60 +175,20 @@ The main launch file is `run.launch`. It has the following important arguments-
     roslaunch ros_openpose run.launch camera:=realsense synchronous:=true py_openpose_path:=absolute_path_to_py_openpose
     ```
   * If the arg `py_openpose_path` is not specified, then the CPP node is used. Otherwise, the python node is used. Therefore, please compile OpenPose accordingly if you plan to use python bindings of the OpenPose.
-
 * **Asynchronous API**
   * Uses two workers, `op::WorkerProducer` and `op::WorkerConsumer` workers provided by OpenPose
   * Uses OpenPose CPP APIs
   * By default this version is enabled. Users are advised to try `synchronous:=true` if not satisfied with the performance.
 
 
-
-## Steps to Run with Intel RealSense Camera
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch
-    ```
+<a name="camrun"></a>
+## Camera Run Instructions
+In this section, you will find the instructions for running ros_openpose with one of the following cameras: Color camera, Realsense, Kinect v2, Azure Kinect, and ZED2.
+If you have a different camera and would like to use ros_openpose with depth properties, please turn to the [FAQ](#faq) section for tips and guidance on achieving this.
 
 
-## Steps to Run with Microsoft Kinect v2 Camera
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch camera:=kinect
-    ```
-
-
-## Steps to Run with Stereolabs ZED2 Camera
-1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `0`).
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch camera:=zed2
-    ```
-
-
-## Steps to Run with Azure Kinect Camera
-1. Make sure that ROS env is sourced properly by executing the following command-
-    ```bash
-    source devel/setup.bash
-    ```
-1. Invoke the main launch file by executing the following command-
-    ```bash
-    roslaunch ros_openpose run.launch camera:=azurekinect
-    ```
-
-
-## Steps to Run with any Color Camera such as Webcam etc.
+<a name="rgbcam"></a>
+### Steps to Run with any Color Camera such as Webcam etc.
 1. Make sure that ROS env is sourced properly by executing the following command-
     ```bash
     source devel/setup.bash
@@ -223,20 +206,74 @@ rosrun image_view image_view image:=YOUR_ROSTOPIC
 Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
 
 
+<a name="intelrs"></a>
+### Steps to Run with Intel RealSense Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch
+    ```
+
+
+<a name="kinv2"></a>
+### Steps to Run with Microsoft Kinect v2 Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch camera:=kinect
+    ```
+
+
+<a name="azkin"></a>
+### Steps to Run with Azure Kinect Camera
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch camera:=azurekinect
+    ```
+
+
+<a name="zed2"></a>
+### Steps to Run with Stereolabs ZED2 Camera
+1. Change the parameter `openni_depth_mode` in [zed-ros-wrapper/zed_wrapper/params/common.yaml](https://github.com/stereolabs/zed-ros-wrapper/blob/master/zed_wrapper/params/common.yaml) to `true` (default is `false`).
+1. Make sure that ROS env is sourced properly by executing the following command-
+    ```bash
+    source devel/setup.bash
+    ```
+1. Invoke the main launch file by executing the following command-
+    ```bash
+    roslaunch ros_openpose run.launch camera:=zed2
+    ```
+
+
 ## FAQ
 1. **How to add my own depth camera into this wrapper?**
 
-    Go inside `launch` subdirectory and make a copy of `config_realsense.launch` as `config_mycamera.launch`. Make necessary changes to the `color_topic`, `depth_topic`, `cam_info_topic` and `frame_id` arguments. More inforation is given below-
+    You might be able to add your own depth camera by creating your own config_<camera_name>.launch file based on one of the existing ones and modify it to suit your specific camera.
+    Go inside the `launch` subdirectory and make a copy of `config_realsense.launch` and save it as `config_<camera_name>.launch`. Remember that whatever you choose as the camera_name, should be used as an argument when launching the run.launch to run ros_openpose. Make necessary changes to the `color_topic`, `depth_topic`, `cam_info_topic`, and `frame_id` arguments in the file. Make sure that:
     * Input depth images are aligned to the color images already. 
-    * Depth and color images have the same dimension. Therefore, each pixel from the color image can be mapped to corresponding depth pixel at the same x, y location. 
-    * The depth images contain depth values in millimeters and represented by `TYPE_16UC1` using OpenCV.
+    * Depth and color images have the same dimension. Therefore, each pixel from the color image can be mapped to its corresponding depth pixel at the same x, y location. 
+    * The depth images contain depth values in millimeters and are represented by `TYPE_16UC1` using OpenCV.
     * The `cam_info_topic` is containing camera calibration parameters supplied by the manufacturer.
+
+    To achieve visualizations, you also need to create new modified versions of the rviz scripts only_person_<camera_name>.rviz and person_pointcloud_<camera_name>.rviz.
 
     Please check [here](https://github.com/ravijo/ros_openpose/issues/9) for a similar question.
 
+    *If you successfully create modified files and run ros_openpose with a depth camera that is not mentioned here, please share your files and the necessary steps for running with your camera. This useful information can be made available to others.*
+
 2. **How to run this wrapper with limited resources such as low GPU, RAM, etc.?**
 
-    Below is a brief explanation about the `ros_openpose` package. This package does not use GPU directly. However, it depends on `OpenPose`, which uses GPU heavily. It contains a few ROS subscribers, which copies data from the camera using ROS. Next, it employs two workers, namely input and output workers. The job of the input worker is to provide color images to the `OpenPose`, whereas the role of the output worker is to receive the keypoints detected in 2D (pixel) space. The output worker then converts 2D pixels to 3D coordinates. The input worker waits for 10 milliseconds if the camera provides no new frames, and then it checks again if no new frame is available. If not, then wait for 10 milliseconds, and the cycle continues. In this way, we make sure that the CPU gets some time to sleep (indirectly lowering the CPU usage). 
+    Below is a brief explanation of the `ros_openpose` package. This package does not use GPU directly. However, it depends on `OpenPose`, which uses GPU heavily. It contains a few ROS subscribers, which copies data from the camera using ROS. Next, it employs two workers, namely input and output workers. The job of the input worker is to provide color images to the `OpenPose`, whereas the role of the output worker is to receive the keypoints detected in 2D (pixel) space. The output worker then converts 2D pixels to 3D coordinates. The input worker waits for 10 milliseconds if the camera provides no new frames, and then it checks again if no new frame is available. If not, then wait for 10 milliseconds, and the cycle continues. In this way, we ensure that the CPU gets some time to sleep (indirectly lowering the CPU usage). 
 
     * If the CPU usage are high, try increasing the sleep value (`SLEEP_MS`) as defined [here](https://github.com/ravijo/ros_openpose/blob/d101e2550ded3bd8d6dd71e27ff43693f28894ab/src/rosOpenpose.cpp#L26). 
     * Try reducing the `--net_resolution` and by using `--model_pose COCO`. 
@@ -254,7 +291,8 @@ Here `YOUR_ROSTOPIC` must have the same value as `color_topic`.
    You can use `cmake` as well. See [here]( https://github.com/ravijo/ros_openpose/blob/b4598b719e5699eb69f80d917a154e008e935c77/CMakeLists.txt#L37)
 
 
-## Note
+<a name="pkgtest"></a>
+## Note on Test Configuration
 This package has been tested on the following environment configuration-
 
 | Name      | Value                                  |
@@ -271,13 +309,12 @@ This package has been tested on the following environment configuration-
 | CUDA      | Version 8.0.61                         |
 | cuDNN     | Version 5.1.10                         |
 
+
 ## Citation
-
 If you used `ros_openpose` for your work, please cite it.
-
 ```tex
 @misc{ros_openpose,
-    author = {Joshi, Ravi P. and van den Broek, Marike K and Tan, Xiang Zhi and Choi, Andrew and Luo, Rui},
+    author = {Joshi, Ravi P. and Choi, Andrew and Tan, Xiang Zhi and Van den Broek, Marike K and Luo, Rui and Choi, Brian},
     title = {{ROS OpenPose}},
     year = {2019},
     publisher = {GitHub},
@@ -286,13 +323,16 @@ If you used `ros_openpose` for your work, please cite it.
 }
 ```
 
-## Issues (or Error Reporting)
+
+<a name="issues"></a>
+## Issues (or Error Reporting) 
 Please check [here](https://github.com/ravijo/ros_openpose/issues) and create issues accordingly.
 
 
 ## Thanks
 Following authors are sincerely acknowledged for the improvements of this package-
-* [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
-* [Xiang Zhi Tan](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
 * [Andrew Choi](https://github.com/QuantuMope): For providing synchronous version i.e., `op_wrapper.emplaceAndPop()` support for OpenPose 1.6
+* [Xiang Zhi Tan](https://github.com/xiangzhi): For providing compatibility for OpenPose 1.6
+* [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
 * [Rui Luo](https://github.com/luorui93): For fixing a crash in ros_openpose_synchronous.py when nobody or only partial body is visible
+* [Brian Choi](https://github.com/BrianChoi12): Fixing gflags library issue causing compilation error

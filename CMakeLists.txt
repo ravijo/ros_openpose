@@ -103,7 +103,7 @@ add_dependencies(rosOpenposeSync ros_openpose_generate_messages_cpp)
 
 target_link_libraries(rosOpenposeAsync
   ${OpenPose_LIBS}
-  ${GFLAGS_LIBRARY}
+  gflags ${GFLAGS_LIBRARY}
   ${GLOG_LIBRARY}
   ${OpenCV_LIBS}
   ${catkin_LIBRARIES}
@@ -111,7 +111,7 @@ target_link_libraries(rosOpenposeAsync
 
 target_link_libraries(rosOpenposeSync
         ${OpenPose_LIBS}
-        ${GFLAGS_LIBRARY}
+        gflags ${GFLAGS_LIBRARY}
         ${GLOG_LIBRARY}
         ${OpenCV_LIBS}
         ${catkin_LIBRARIES}
