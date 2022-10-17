@@ -35,7 +35,7 @@ Date: 2019/11/23
     <arg name="openpose_args" value="--hand --disable_multi_thread --model_folder /home/ravi/openpose/models/" />
   ?>
   <!-- full path to the model dir of openpose -->
-  <arg name="openpose_args" value="--model_folder /home/ravi/openpose/models/" />
+  <arg name="openpose_args" value="--model_folder $(env HOME)/openpose/models/" />
 
   <!-- rostopic to publish the 3D skeleton data -->
   <arg name="pub_topic" default="/frame" />
