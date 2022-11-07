@@ -193,6 +193,36 @@ public:
     }
   }
 
+  template <typename ArrayOfArray>
+  void fillFaceROSMsg(ArrayOfArray& faceKeypoints, int person, int facePartCount)
+  {
+#pragma omp parallel for
+    for (auto facePart = 0; facePart < facePartCount; facePart++)
+    {
+      const auto baseIndex = faceKeypoints.getSize(2) * (person * facePartCount + facePart);
+
+      // face
+      const auto xFace = faceKeypoints[baseIndex];
+      const auto yFace = faceKeypoints[baseIndex + 1];
+      const auto scoreFace = faceKeypoints[baseIndex + 2];
+
+      float point3DFace[3];
+
+      // compute 3D point only if depth flag is set
+      if (!mNoDepth)
+      {
+        mSPtrCameraReader->compute3DPoint(xFace, yFace, point3DFace);
+      }
+
+      mFrame.persons[person].faceParts[facePart].pixel.x = xFace;
+      mFrame.persons[person].faceParts[facePart].pixel.y = yFace;
+      mFrame.persons[person].faceParts[facePart].score = scoreFace;
+      mFrame.persons[person].faceParts[facePart].point.x = point3DFace[0];
+      mFrame.persons[person].faceParts[facePart].point.y = point3DFace[1];
+      mFrame.persons[person].faceParts[facePart].point.z = point3DFace[2];
+    }
+  }
+
   void workConsumer(const sPtrVecSPtrDatum& datumsPtr)
   {
     try
@@ -211,11 +241,13 @@ public:
         // accesing each element of the keypoints
         const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
         const auto& handKeypoints = datumsPtr->at(0)->handKeypoints;
+        const auto& faceKeypoints = datumsPtr->at(0)->faceKeypoints;
 
         // get the size
         const auto personCount = poseKeypoints.getSize(0);
         const auto bodyPartCount = poseKeypoints.getSize(1);
         const auto handPartCount = handKeypoints[0].getSize(1);
+        const auto facePartCount = faceKeypoints.getSize(1);        
 
         mFrame.persons.resize(personCount);
 
@@ -225,9 +257,11 @@ public:
           mFrame.persons[person].bodyParts.resize(bodyPartCount);
           mFrame.persons[person].leftHandParts.resize(handPartCount);
           mFrame.persons[person].rightHandParts.resize(handPartCount);
+          mFrame.persons[person].faceParts.resize(facePartCount);          
 
           fillBodyROSMsg(poseKeypoints, person, bodyPartCount);
           fillHandROSMsg(handKeypoints, person, handPartCount);
+          fillFaceROSMsg(faceKeypoints, person, facePartCount);
         }
 
         mFramePublisher.publish(mFrame);
