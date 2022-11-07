@@ -292,3 +292,4 @@ Following authors are sincerely acknowledged for the improvements of this packag
 * [Marike Koch van den Broek](https://github.com/ruksen25): For adding support for [Stereolabs ZED2 Camera](https://www.stereolabs.com/zed-2/)
 * [Rui Luo](https://github.com/luorui93): For fixing a crash in ros_openpose_synchronous.py when nobody or only partial body is visible
 * [Brian Choi](https://github.com/BrianChoi12): Fixing gflags library issue causing compilation error
+* [RiRyuichi](https://github.com/RiRyuichi): For providing support for face keypoints
