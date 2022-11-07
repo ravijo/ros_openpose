@@ -96,11 +96,13 @@ public:
 
         const auto& pose_kp = datum_ptr->at(0)->poseKeypoints;
         const auto& hand_kp = datum_ptr->at(0)->handKeypoints;
+        const auto& face_kp = datum_ptr->at(0)->faceKeypoints;
 
         // get the size
         const auto num_persons = pose_kp.getSize(0);
         const auto body_part_count = pose_kp.getSize(1);
         const auto hand_part_count = hand_kp[0].getSize(1);
+        const auto face_part_count = face_kp.getSize(1);
 
         _frame_msg.persons.resize(num_persons);
         int i;
@@ -110,6 +112,8 @@ public:
             curr_person.bodyParts.resize(body_part_count);
             curr_person.leftHandParts.resize(hand_part_count);
             curr_person.rightHandParts.resize(hand_part_count);
+            curr_person.faceParts.resize(face_part_count);
+
 
             // Fill body parts
             for (auto bp = 0; bp < body_part_count; bp++) {
@@ -129,6 +133,13 @@ public:
                 // Right Hand
                 auto& curr_right_hand = curr_person.rightHandParts[hp];
                 assign_msg_vals(curr_right_hand, hand_kp[1], i);
+            }
+
+            // Fill face parts
+            for (auto fp = 0; fp < face_part_count; fp++) {
+                auto& curr_face_part = curr_person.faceParts[fp];
+                i = face_kp.getSize(2) * (p * face_part_count + fp);
+                assign_msg_vals(curr_face_part, face_kp, i);
             }
         }
         _pub.publish(_frame_msg);
